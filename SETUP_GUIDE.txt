@@ -1,0 +1,26 @@
+================================================================
+INVESTSMART — Complete Setup Guide
+For Sri Lankan Investors | No Coding Knowledge Required
+================================================================
+
+WHAT YOU NEED BEFORE STARTING:
+✓ GitHub account (github.com)
+✓ Google account
+✓ Supabase account (supabase.com)
+✓ Anthropic API key (console.anthropic.com) — PAID, you have this
+✓ OpenAI API key (platform.openai.com) — PAID, you have this
+✓ FRED API key (fred.stlouisfed.org) — FREE
+✓ NewsAPI key (newsapi.org) — FREE
+✓ Gemini API key (aistudio.google.com) — FREE fallback
+
+STEPS STILL TO COMPLETE:
+□ STEP A: Neo4j Aura free account
+□ STEP B: Domain name (Namecheap)
+□ STEP 1: Upload files to GitHub
+□ STEP 2: Set up Supabase database
+□ STEP 3: Add all secrets to GitHub
+□ STEP 4: Deploy on Streamlit Cloud
+□ STEP 5: Add secrets to Streamlit
+□ STEP 6: Test the app
+
+================================================================
