@@ -1,0 +1,36 @@
+# Environment & secrets — NEVER upload these to GitHub
+.env
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Data files (generated daily — too large for git)
+data_snapshot_*.json
+briefing_*.md
+
+# Development
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
