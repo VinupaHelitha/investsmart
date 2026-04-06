@@ -1,0 +1,30 @@
+# InvestSmart — Python Dependencies
+# Install with: pip install -r requirements.txt
+
+# ── Core Framework ──────────────────────────────
+streamlit>=1.35.0
+
+# ── Data & Finance ──────────────────────────────
+yfinance>=0.2.38
+pandas>=2.0.0
+numpy>=1.24.0
+requests>=2.31.0
+
+# ── AI Providers ────────────────────────────────
+anthropic>=0.25.0          # PRIMARY: Claude (claude-sonnet-4-6)
+openai>=1.30.0             # SECONDARY: GPT-4o
+google-generativeai>=0.5.0 # FALLBACK: Gemini 1.5 Flash (free)
+
+# ── Database ─────────────────────────────────────
+supabase>=2.4.0            # PostgreSQL + auth (free 500MB)
+neo4j>=5.19.0              # Graph database for behaviour prediction
+
+# ── Visualisation ────────────────────────────────
+plotly>=5.20.0             # Candlestick charts, line charts
+
+# ── Web Scraping (CSE) ───────────────────────────
+beautifulsoup4>=4.12.0
+lxml>=5.0.0
+
+# ── Utilities ────────────────────────────────────
+python-dotenv>=1.0.0       # Load .env file locally
