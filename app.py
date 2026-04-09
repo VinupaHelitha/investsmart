@@ -680,7 +680,7 @@ elif page == "🤖 AI Briefing":
     # Show AI ey status
     with st.expander("AI Provider Status"):
         st.markdown(f"🟢 **Claude (Primary):** {'Configured ✓' if ANTHROPIC_API_KEY else '❌ Missing ANTHROPIC_API_KEY'}")
-        st.markdown(f"🟡 **OpenAI (Secondary):** {#Configured"✓'if OPENAI_API_KEY else '❌ Missing OPENAI_API_KEY'}")
+        st.markdown(f"🟡 **OpenAI (Secondary):** {'Configured ✓' if OPENAI_API_KEY else '❌ Missing OPENAI_API_KEY'}")
         st.markdown(f"🟠 **Gemini (Fallback):** {'Configured ✓' if GEMINI_API_KEY else '❌ Missing GEMINI_API_KEY'}")
 
     if generate_btn:
