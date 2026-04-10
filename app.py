@@ -490,12 +490,13 @@ elif page == "🥇 Gold & Silver":
     gold_lkr_val   = gp * usd_lkr_rate if gp else None
     silver_lkr_val = sp * usd_lkr_rate if sp else None
 
-    # ── Top Metrics Row (full width — prevents truncation) ──
+    # ── Top Metrics — 2 rows of 3 (wider cards, no truncation) ──
     st.markdown("### Key Prices")
-    m1, m2, m3, m4, m5, m6 = st.columns(6)
+    m1, m2, m3 = st.columns(3)
     m1.metric("Gold (USD/oz)",    f"${gp:,.2f}"           if gp else "N/A", f"{gpct:+.2f}%" if gpct else None)
     m2.metric("Gold (LKR/oz)",    fmt_lkr(gold_lkr_val),  f"{gpct:+.2f}%" if gpct else None)
     m3.metric("Gold (USD/gram)",  f"${gp/31.1035:,.2f}"   if gp else "N/A")
+    m4, m5, m6 = st.columns(3)
     m4.metric("Silver (USD/oz)",  f"${sp:,.2f}"           if sp else "N/A", f"{spct:+.2f}%" if spct else None)
     m5.metric("Silver (LKR/oz)",  fmt_lkr(silver_lkr_val))
     m6.metric("Gold/Silver Ratio",f"{gp/sp:.1f}x"         if gp and sp else "N/A")
