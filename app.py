@@ -15,6 +15,7 @@ Run:    streamlit run app.py
 """
 
 import os
+import re
 import streamlit as st
 import pandas as pd
 import requests
@@ -103,8 +104,8 @@ def fmt_index(value: float | None) -> str:
         return "N/A"
     if value >= 100_000:
         return f"{value/1_000:.1f}K"
-    if value >= 10_000:
-        return f"{value:,.0f}"
+    if value >= 1_000:
+        return f"{value:,.0f}"   # no decimals — avoids truncation in narrow cards
     return f"{value:,.2f}"
 
 
@@ -682,7 +683,7 @@ elif page == "📰 News Feed":
     st.caption("Latest financial news — categorised for Sri Lankan investors")
 
     categories = {
-        "Sri Lanka":      "Sri Lanka economy stock market CSE",
+        "Sri Lanka":      "Sri Lanka",          # short query = more top-headline matches,
         "Gold & Silver":  "gold silver price precious metals",
         "US Economy":     "Federal Reserve inflation US economy",
         "Asian Markets":  "India China Asian stock market",
@@ -711,7 +712,9 @@ elif page == "📰 News Feed":
 
             for art in articles:
                 title  = art.get("title", "")
-                desc   = art.get("description", "")
+                desc   = art.get("description", "") or ""
+                # Strip HTML tags that sometimes appear in API descriptions
+                desc   = re.sub(r"<[^>]+>", "", desc).strip()
                 url    = art.get("url", "")
                 source = art.get("source", {}).get("name", "")
                 pub_at = art.get("publishedAt", "")[:10]
