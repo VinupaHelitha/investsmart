@@ -339,8 +339,11 @@ if page == "🏠 Dashboard":
         g = gold.get("close")
         r = usd_lkr.get("close")
         gold_lkr = g * r if g and r else None
-        st.metric("Gold (LKR/oz)", f"LKR {gold_lkr:,.0f}" if gold_lkr else "N/A",
-                  metric_delta(gold))
+        if gold_lkr:
+            gold_lkr_fmt = f"LKR {gold_lkr/1_000_000:.2f}M" if gold_lkr >= 1_000_000 else f"LKR {gold_lkr:,.0f}"
+        else:
+            gold_lkr_fmt = "N/A"
+        st.metric("Gold (LKR/oz)", gold_lkr_fmt, metric_delta(gold))
     with col3:
         v = usd_lkr.get("close")
         st.metric("USD / LKR", f"LKR {v:,.2f}" if v else "N/A", metric_delta(usd_lkr),
