@@ -73,9 +73,40 @@ st.markdown("""
         text-transform: uppercase;
         margin: 1.5rem 0 0.5rem 0;
     }
-    div[data-testid="stMetric"] { background: #1e2130; border-radius: 10px; padding: 12px; }
+    div[data-testid="stMetric"] {
+        background: #1e2130;
+        border-radius: 10px;
+        padding: 12px;
+    }
+    div[data-testid="stMetric"] label {
+        font-size: 0.78rem !important;
+    }
 </style>
 """, unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────────
+# HELPER FORMATTERS
+# ─────────────────────────────────────────────────
+def fmt_lkr(value: float | None) -> str:
+    """Format LKR value compactly — avoids card truncation."""
+    if value is None:
+        return "N/A"
+    if value >= 1_000_000:
+        return f"LKR {value/1_000_000:.2f}M"
+    if value >= 1_000:
+        return f"LKR {value:,.0f}"
+    return f"LKR {value:,.2f}"
+
+def fmt_index(value: float | None) -> str:
+    """Format index value compactly for narrow metric cards."""
+    if value is None:
+        return "N/A"
+    if value >= 100_000:
+        return f"{value/1_000:.1f}K"
+    if value >= 10_000:
+        return f"{value:,.0f}"
+    return f"{value:,.2f}"
+
 
 # ─────────────────────────────────────────────────
 # DATA FETCHING FUNCTIONS (cached for performance)
@@ -147,21 +178,36 @@ def fetch_fred(series_id: str) -> float | None:
 
 @st.cache_data(ttl=1800)  # 30 minutes — news
 def fetch_news(query: str, n: int = 8) -> list:
-    """Fetch news articles from NewsAPI."""
+    """Fetch top-headline news from NewsAPI (free tier compatible)."""
     if not NEWS_API_KEY:
         return []
     try:
-        url = "https://newsapi.org/v2/everything"
+        # Use top-headlines with a keyword search — works on free NewsAPI tier
+        url = "https://newsapi.org/v2/top-headlines"
         params = {
             "q":        query,
             "apiKey":   NEWS_API_KEY,
             "pageSize": n,
             "language": "en",
-            "sortBy":   "publishedAt",
         }
         r    = requests.get(url, params=params, timeout=10)
         data = r.json()
-        return data.get("articles", [])[:n]
+        articles = data.get("articles", [])
+        # If top-headlines returns nothing, try everything endpoint as fallback
+        if not articles:
+            url2 = "https://newsapi.org/v2/everything"
+            params2 = {
+                "q":        query,
+                "apiKey":   NEWS_API_KEY,
+                "pageSize": n,
+                "language": "en",
+                "sortBy":   "publishedAt",
+                "from":     str(date.today() - timedelta(days=7)),
+            }
+            r2    = requests.get(url2, params=params2, timeout=10)
+            data2 = r2.json()
+            articles = data2.get("articles", [])
+        return [a for a in articles if "[Removed]" not in (a.get("title") or "")][:n]
     except Exception:
         return []
 
@@ -322,6 +368,7 @@ if page == "🏠 Dashboard":
         vix    = current_price("^VIX")
         oil    = current_price("BZ=F")
         sensex = current_price("^BSESN")
+        nifty  = current_price("^NSEI")
 
     # ── Highlighted Metrics ──
     st.markdown("### 🔑 Key Indicators")
@@ -339,11 +386,7 @@ if page == "🏠 Dashboard":
         g = gold.get("close")
         r = usd_lkr.get("close")
         gold_lkr = g * r if g and r else None
-        if gold_lkr:
-            gold_lkr_fmt = f"LKR {gold_lkr/1_000_000:.2f}M" if gold_lkr >= 1_000_000 else f"LKR {gold_lkr:,.0f}"
-        else:
-            gold_lkr_fmt = "N/A"
-        st.metric("Gold (LKR/oz)", gold_lkr_fmt, metric_delta(gold))
+        st.metric("Gold (LKR/oz)", fmt_lkr(gold_lkr), metric_delta(gold))
     with col3:
         v = usd_lkr.get("close")
         st.metric("USD / LKR", f"LKR {v:,.2f}" if v else "N/A", metric_delta(usd_lkr),
@@ -358,37 +401,36 @@ if page == "🏠 Dashboard":
     # ── Markets Grid ──
     col_a, col_b, col_c = st.columns(3)
     with col_a:
-        st.markdown("**🇺🇸 US Markets**")
+        st.markdown("**🌐 US Markets**")
         v = sp500.get("close")
-        p = sp500.get("change_pct", 0)
-        color = "positive" if p and p >= 0 else "negative"
+        p = sp500.get("change_pct") or 0
+        color = "positive" if p >= 0 else "negative"
         st.markdown(f"S&P 500: `{v:,.2f}` <span class='{color}'>{p:+.2f}%</span>" if v else "S&P 500: N/A", unsafe_allow_html=True)
         v = oil.get("close")
-        p = oil.get("change_pct", 0)
-        color = "positive" if p and p >= 0 else "negative"
+        p = oil.get("change_pct") or 0
+        color = "positive" if p >= 0 else "negative"
         st.markdown(f"Brent Oil: `${v:,.2f}` <span class='{color}'>{p:+.2f}%</span>" if v else "Brent Oil: N/A", unsafe_allow_html=True)
 
     with col_b:
         st.markdown("**🌏 Asian Markets**")
         v = sensex.get("close")
-        p = sensex.get("change_pct", 0)
-        color = "positive" if p and p >= 0 else "negative"
+        p = sensex.get("change_pct") or 0
+        color = "positive" if p >= 0 else "negative"
         st.markdown(f"BSE Sensex: `{v:,.0f}` <span class='{color}'>{p:+.2f}%</span>" if v else "BSE Sensex: N/A", unsafe_allow_html=True)
-        nifty = current_price("^NSEI")
         v = nifty.get("close")
-        p = nifty.get("change_pct", 0)
-        color = "positive" if p and p >= 0 else "negative"
+        p = nifty.get("change_pct") or 0
+        color = "positive" if p >= 0 else "negative"
         st.markdown(f"Nifty 50: `{v:,.0f}` <span class='{color}'>{p:+.2f}%</span>" if v else "Nifty 50: N/A", unsafe_allow_html=True)
 
     with col_c:
         st.markdown("**💰 Precious Metals**")
         v = silver.get("close")
-        p = silver.get("change_pct", 0)
-        color = "positive" if p and p >= 0 else "negative"
+        p = silver.get("change_pct") or 0
+        color = "positive" if p >= 0 else "negative"
         st.markdown(f"Silver: `${v:,.2f}/oz` <span class='{color}'>{p:+.2f}%</span>" if v else "Silver: N/A", unsafe_allow_html=True)
         v = gold.get("close")
-        p = gold.get("change_pct", 0)
-        color = "positive" if p and p >= 0 else "negative"
+        p = gold.get("change_pct") or 0
+        color = "positive" if p >= 0 else "negative"
         st.markdown(f"Gold: `${v:,.2f}/oz` <span class='{color}'>{p:+.2f}%</span>" if v else "Gold: N/A", unsafe_allow_html=True)
 
     # ── 30-day Performance Comparison ──
@@ -436,22 +478,35 @@ elif page == "🥇 Gold & Silver":
     period_code = period_map[period_sel]
 
     usd_lkr_data = current_price("LKR=X")
-    usd_lkr_rate = usd_lkr_data.get("close", 300)
+    usd_lkr_rate = usd_lkr_data.get("close") or 312  # updated fallback
 
+    gold   = current_price("GC=F")
+    silver = current_price("SI=F")
+    gp     = gold.get("close")
+    gpct   = gold.get("change_pct") or 0
+    sp     = silver.get("close")
+    spct   = silver.get("change_pct") or 0
+
+    gold_lkr_val   = gp * usd_lkr_rate if gp else None
+    silver_lkr_val = sp * usd_lkr_rate if sp else None
+
+    # ── Top Metrics Row (full width — prevents truncation) ──
+    st.markdown("### Key Prices")
+    m1, m2, m3, m4, m5, m6 = st.columns(6)
+    m1.metric("Gold (USD/oz)",    f"${gp:,.2f}"           if gp else "N/A", f"{gpct:+.2f}%" if gpct else None)
+    m2.metric("Gold (LKR/oz)",    fmt_lkr(gold_lkr_val),  f"{gpct:+.2f}%" if gpct else None)
+    m3.metric("Gold (USD/gram)",  f"${gp/31.1035:,.2f}"   if gp else "N/A")
+    m4.metric("Silver (USD/oz)",  f"${sp:,.2f}"           if sp else "N/A", f"{spct:+.2f}%" if spct else None)
+    m5.metric("Silver (LKR/oz)",  fmt_lkr(silver_lkr_val))
+    m6.metric("Gold/Silver Ratio",f"{gp/sp:.1f}x"         if gp and sp else "N/A")
+
+    st.markdown("---")
+
+    # ── Charts side by side ──
     col1, col2 = st.columns(2)
 
-    # ── Gold Section ──
     with col1:
         st.markdown("#### Gold (GC=F)")
-        gold  = current_price("GC=F")
-        gp    = gold.get("close")
-        gpct  = gold.get("change_pct", 0)
-
-        c1, c2, c3 = st.columns(3)
-        c1.metric("USD/oz",    f"${gp:,.2f}"                           if gp else "N/A", f"{gpct:+.2f}%"  if gpct else None)
-        c2.metric("LKR/oz",    f"LKR {gp*usd_lkr_rate:,.0f}"          if gp else "N/A")
-        c3.metric("USD/gram",  f"${gp/31.1035:,.2f}"                   if gp else "N/A")
-
         df_gold = fetch_price("GC=F", period=period_code)
         if df_gold is not None:
             fig = go.Figure(data=[go.Candlestick(
@@ -466,24 +521,16 @@ elif page == "🥇 Gold & Silver":
             )])
             fig.update_layout(
                 title=f"Gold — {period_sel}",
-                template="plotly_dark", height=300,
+                template="plotly_dark", height=320,
                 xaxis_rangeslider_visible=False,
                 margin=dict(l=0, r=0, t=40, b=20),
             )
             st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("Gold chart data unavailable.")
 
-    # ── Silver Section ──
     with col2:
         st.markdown("#### Silver (SI=F)")
-        silver = current_price("SI=F")
-        sp     = silver.get("close")
-        spct   = silver.get("change_pct", 0)
-
-        c1, c2, c3 = st.columns(3)
-        c1.metric("USD/oz",   f"${sp:,.2f}"                   if sp else "N/A", f"{spct:+.2f}%" if spct else None)
-        c2.metric("LKR/oz",   f"LKR {sp*usd_lkr_rate:,.0f}"  if sp else "N/A")
-        c3.metric("Gold/Silver Ratio", f"{gp/sp:.1f}x"        if gp and sp else "N/A")
-
         df_silver = fetch_price("SI=F", period=period_code)
         if df_silver is not None:
             fig = go.Figure(data=[go.Candlestick(
@@ -498,11 +545,13 @@ elif page == "🥇 Gold & Silver":
             )])
             fig.update_layout(
                 title=f"Silver — {period_sel}",
-                template="plotly_dark", height=300,
+                template="plotly_dark", height=320,
                 xaxis_rangeslider_visible=False,
                 margin=dict(l=0, r=0, t=40, b=20),
             )
             st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("Silver chart data unavailable.")
 
     # ── Gold in LKR Chart ──
     st.markdown("---")
@@ -540,7 +589,7 @@ elif page == "🥇 Gold & Silver":
     col_b.metric("Fed Funds Rate",        f"{fed_rate:.2f}%"  if fed_rate  else "N/A")
     col_c.metric("USD Index (DXY)",       f"{dxy:.2f}"        if dxy       else "N/A",
                  help="Weak USD → higher gold in USD terms")
-    col_d.metric("10Y Breakeven Inflation",f"{inflation:.2f}%"if inflation else "N/A",
+    col_d.metric("10Y Breakeven Inflation",f"{inflation:.2f}%" if inflation else "N/A",
                  help="Higher inflation expectations → bullish for gold")
 
 
@@ -551,31 +600,37 @@ elif page == "🌍 Global Markets":
     st.title("🌍 Global Markets")
     st.caption("US, Asian, and European indices — with Sri Lanka context")
 
+    # Note: country flag emojis don't render on Linux — using text labels instead
     TICKERS = {
-        "🇺🇸 S&P 500":       "^GSPC",
-        "🇺🇸 NASDAQ":         "^IXIC",
-        "🇺🇸 Dow Jones":      "^DJI",
-        "😱 VIX (Fear)":       "^VIX",
-        "🇮🇳 BSE Sensex":     "^BSESN",
-        "🇮🇳 Nifty 50":       "^NSEI",
-        "🇭🇰 Hang Seng":      "^HSI",
-        "🇯🇵 Nikkei 225":     "^N225",
-        "🇬🇧 FTSE 100":       "^FTSE",
-        "🇩🇪 DAX":            "^GDAXI",
+        "S&P 500":    "^GSPC",
+        "NASDAQ":     "^IXIC",
+        "Dow Jones":  "^DJI",
+        "VIX (Fear)": "^VIX",
+        "BSE Sensex": "^BSESN",
+        "Nifty 50":   "^NSEI",
+        "Hang Seng":  "^HSI",
+        "Nikkei 225": "^N225",
+        "FTSE 100":   "^FTSE",
+        "DAX":        "^GDAXI",
     }
 
     st.markdown("### Live Prices")
+    with st.spinner("Loading global prices..."):
+        prices = {name: current_price(ticker) for name, ticker in TICKERS.items()}
+
     cols = st.columns(5)
     for i, (name, ticker) in enumerate(TICKERS.items()):
-        d    = current_price(ticker)
+        d    = prices[name]
         v    = d.get("close")
-        pct  = d.get("change_pct", 0) or 0
-        delta_col = "normal"
-        if "VIX" in name:
-            delta_col = "inverse"
+        pct  = d.get("change_pct") or 0
+        delta_col = "inverse" if "VIX" in name else "normal"
         with cols[i % 5]:
-            st.metric(name, f"{v:,.2f}" if v else "N/A",
-                      f"{pct:+.2f}%" if v else None, delta_color=delta_col)
+            st.metric(
+                name,
+                fmt_index(v),
+                f"{pct:+.2f}%" if v else None,
+                delta_color=delta_col
+            )
 
     st.markdown("---")
     st.markdown("### 📉 1-Month Chart")
@@ -595,10 +650,12 @@ elif page == "🌍 Global Markets":
             xaxis_rangeslider_visible=False,
         )
         st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info(f"Chart data unavailable for {selected}.")
 
     # ── Forex ──
     st.markdown("---")
-    st.markdown("### 💱 Forex ─ Sri Lanka Relevant Pairs")
+    st.markdown("### 💱 Forex — Sri Lanka Relevant Pairs")
     forex = {
         "USD / LKR": "LKR=X",
         "USD Index":  "DX-Y.NYB",
@@ -607,11 +664,13 @@ elif page == "🌍 Global Markets":
         "USD / JPY":  "JPY=X",
     }
     c1, c2, c3, c4, c5 = st.columns(5)
-    for col, (name, ticker) in zip([c1,c2,c3,c4,c5], forex.items()):
+    for col, (name, ticker) in zip([c1, c2, c3, c4, c5], forex.items()):
         d   = current_price(ticker)
         v   = d.get("close")
-        pct = d.get("change_pct", 0) or 0
-        col.metric(name, f"{v:,.4f}" if v else "N/A", f"{pct:+.2f}%" if v else None)
+        pct = d.get("change_pct") or 0
+        # LKR pairs: 2 decimal places; others: 4 decimal places
+        val_fmt = f"{v:,.2f}" if (v and "LKR" in name) else (f"{v:,.4f}" if v else "N/A")
+        col.metric(name, val_fmt, f"{pct:+.2f}%" if v else None)
 
 
 # ─────────────────────────────────────────────────
@@ -622,15 +681,20 @@ elif page == "📰 News Feed":
     st.caption("Latest financial news — categorised for Sri Lankan investors")
 
     categories = {
-        "🇱🇰 Sri Lanka":       "Sri Lanka economy stock market CSE",
-        "🥇 Gold & Silver":    "gold silver price precious metals",
-        "💵 US Economy":       "Federal Reserve inflation US economy",
-        "🌏 Asian Markets":    "India China Asian stock market",
-        "⚡ Oil & Energy":      "oil price OPEC energy commodity",
-        "🌍 Geopolitical":     "geopolitical risk war sanctions",
+        "Sri Lanka":      "Sri Lanka economy stock market CSE",
+        "Gold & Silver":  "gold silver price precious metals",
+        "US Economy":     "Federal Reserve inflation US economy",
+        "Asian Markets":  "India China Asian stock market",
+        "Oil & Energy":   "oil price OPEC energy commodity",
+        "Geopolitical":   "geopolitical risk war sanctions",
     }
 
-    tabs = st.tabs(list(categories.keys()))
+    tabs = st.tabs(["🌴 " + k if k == "Sri Lanka" else
+                    "🥇 " + k if k == "Gold & Silver" else
+                    "💵 " + k if k == "US Economy" else
+                    "🌏 " + k if k == "Asian Markets" else
+                    "⚡ " + k if k == "Oil & Energy" else
+                    "🌍 " + k for k in categories.keys()])
 
     for tab, (cat_name, query) in zip(tabs, categories.items()):
         with tab:
@@ -641,21 +705,21 @@ elif page == "📰 News Feed":
                 if not NEWS_API_KEY:
                     st.warning("Add NEWS_API_KEY to your secrets to see news.")
                 else:
-                    st.info("No articles found.")
+                    st.info("No recent articles found. Try refreshing later.")
                 continue
 
             for art in articles:
-                title   = art.get("title", "")
-                desc    = art.get("description", "")
-                url     = art.get("url", "")
-                source  = art.get("source", {}).get("name", "")
-                pub_at  = art.get("publishedAt", "")[:10]
+                title  = art.get("title", "")
+                desc   = art.get("description", "")
+                url    = art.get("url", "")
+                source = art.get("source", {}).get("name", "")
+                pub_at = art.get("publishedAt", "")[:10]
 
                 if title and "[Removed]" not in title:
                     with st.container():
                         st.markdown(f"**[{title}]({url})**")
-                        if desc:
-                            st.caption(desc[:200])
+                        if desc and "[Removed]" not in desc:
+                            st.caption(desc[:220])
                         st.caption(f"{source} · {pub_at}")
                         st.markdown("---")
 
@@ -667,28 +731,23 @@ elif page == "🤖 AI Briefing":
     st.title("🤖 AI Market Briefing")
     st.caption("Daily market analysis powered by Claude AI (with OpenAI and Gemini fallback)")
 
-    # Check for saved briefing first
-    today_file = f"briefing_{date.today()}.md"
-    has_saved  = os.path.exists(today_file)
-
     col_btn, col_info = st.columns([1, 3])
     with col_btn:
         generate_btn = st.button("✨ Generate Today's Briefing", type="primary", use_container_width=True)
     with col_info:
-        if has_saved:
-            st.success(f"Today's briefing was already generated ─ click to regenerate or scroll down to read it.")
+        if st.session_state.get("briefing"):
+            st.success("Today's briefing is ready — scroll down to read it, or click to regenerate.")
         else:
             st.info("Click to generate today's AI market briefing (takes ~30–60 seconds).")
 
-    # Show AI ey status
+    # Show AI key status
     with st.expander("AI Provider Status"):
         st.markdown(f"🟢 **Claude (Primary):** {'Configured ✓' if ANTHROPIC_API_KEY else '❌ Missing ANTHROPIC_API_KEY'}")
         st.markdown(f"🟡 **OpenAI (Secondary):** {'Configured ✓' if OPENAI_API_KEY else '❌ Missing OPENAI_API_KEY'}")
         st.markdown(f"🟠 **Gemini (Fallback):** {'Configured ✓' if GEMINI_API_KEY else '❌ Missing GEMINI_API_KEY'}")
 
     if generate_btn:
-        with st.spinner("🧠 Fetching market data and generating briefing with Claude..."):
-            # Collect market data
+        with st.spinner("🧠 Fetching market data and generating briefing..."):
             market_data = {
                 "gold":    current_price("GC=F"),
                 "silver":  current_price("SI=F"),
@@ -701,33 +760,23 @@ elif page == "🤖 AI Briefing":
                 "dxy":     current_price("DX-Y.NYB"),
                 "nasdaq":  current_price("^IXIC"),
             }
-
             briefing_text, model_used = generate_briefing(market_data)
 
-        if briefing_text and "ERROR" not in briefing_text:
+        if briefing_text and "ERROR" not in briefing_text and "failed" not in briefing_text.lower()[:50]:
             st.success(f"✅ Briefing generated by **{model_used}**")
-            # Save to file
-            try:
-                with open(today_file, "w", encoding="utf-8") as f:
-                    f.write(briefing_text)
-            except Exception:
-                pass
             st.session_state["briefing"]   = briefing_text
             st.session_state["model_used"] = model_used
         else:
             st.error(briefing_text)
 
-    # Display briefing
+    # Display briefing from session state only (file system not reliable on cloud)
     briefing_to_show = st.session_state.get("briefing")
-    if not briefing_to_show and has_saved:
-        try:
-            with open(today_file, "r", encoding="utf-8") as f:
-                briefing_to_show = f.read()
-        except Exception:
-            pass
+    model_label      = st.session_state.get("model_used", "")
 
     if briefing_to_show:
         st.markdown("---")
+        if model_label:
+            st.caption(f"Generated by: {model_label}")
         st.markdown(briefing_to_show)
 
 
@@ -752,8 +801,6 @@ and generates daily AI briefings to help you make better-informed investment dec
 | FRED (Federal Reserve) | US macro data: interest rates, inflation, yield curve |
 | World Bank Open API | Sri Lanka macro: GDP, CPI, FDI, remittances |
 | NewsAPI | 6 categories of financial news |
-| GDELT Project | Geopolitical event monitoring (free, real-time) |
-| cse.lk scraper | Colombo Stock Exchange market data |
 
 ## AI Technology
 
@@ -762,15 +809,12 @@ and generates daily AI briefings to help you make better-informed investment dec
 | 1st | Claude claude-sonnet-4-6 (Anthropic) | Daily briefings, sector analysis |
 | 2nd | GPT-4o (OpenAI) | Fallback for briefings |
 | 3rd | Gemini 1.5 Flash (Google) | Free fallback |
-| Graph | Neo4j AuraDB | Investor behaviour prediction |
 
 ## Platform Architecture
 
 - **Frontend:** Streamlit (Python web framework)
 - **Hosting:** Streamlit Community Cloud (free)
 - **Database:** Supabase PostgreSQL (free 500MB)
-- **Automation:** GitHub Actions (runs daily at 3:00 PM and 3:30 PM Sri Lanka time)
-- **Graph AI:** Neo4j Aura Free (investor behaviour patterns)
 
 ## Disclaimer
 
