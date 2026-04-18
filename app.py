@@ -17,6 +17,7 @@ import yfinance as yf
 import plotly.graph_objects as go
 from datetime import datetime, date, timedelta
 from dotenv import load_dotenv
+import html as _html
 
 try:
     from supabase import create_client
@@ -119,6 +120,12 @@ def fmt_index(value: float | None) -> str:
     if value >= 100_000: return f"{value/1_000:.1f}K"
     if value >= 1_000:   return f"{value:,.0f}"
     return f"{value:,.2f}"
+
+
+def _valid_ticker(t: str) -> bool:
+    """Allow only safe ticker characters to prevent injection."""
+    import re
+    return bool(re.match(r'^[A-Z0-9\.\^=\-]{1,20}$', t.strip().upper()))
 
 # \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # SUPABASE CLIENT
@@ -289,17 +296,21 @@ C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
 </svg>"""
 
 def _google_btn(label: str):
-    """Render Google OAuth button and return URL, or None if unavailable."""
+    """Render Google OAuth button. Shows setup notice if not configured."""
     if not _sb: return
     try:
         g = _sb.auth.sign_in_with_oauth({
             "provider": "google",
             "options": {"redirect_to": APP_URL, "scopes": "email profile"}
         })
-        st.markdown(f"""<div class="google-btn-wrap">
+        if g.url:
+            st.markdown(f"""<div class="google-btn-wrap">
           <a href="{g.url}" target="_self">
             <div class="google-btn">{_G_ICON}&nbsp; {label}</div>
           </a></div>""", unsafe_allow_html=True)
+            st.caption("\u2139\ufe0f If Google sign-in shows a 403 error, use Email or Phone OTP instead while Google OAuth is being configured.")
+        else:
+            st.caption("Google sign-in not yet configured \u2014 use email or phone below.")
     except:
         st.caption("Google sign-in not yet configured \u2014 use email or phone below.")
 
@@ -339,8 +350,11 @@ def show_auth_page():
                 ok = st.form_submit_button("Sign In \u2192", use_container_width=True,
                                            type="primary")
             if ok:
+                import re as _re
                 if not email or not password:
                     st.error("Enter both email and password.")
+                elif not _re.match(r"[^@]+@[^@]+\.[^@]+", email):
+                    st.error("Enter a valid email address.")
                 elif _sb:
                     try:
                         r = _sb.auth.sign_in_with_password(
@@ -377,8 +391,11 @@ def show_auth_page():
                 sub = st.form_submit_button("Create Account \u2192",
                                             use_container_width=True, type="primary")
             if sub:
+                import re as _re
                 if not name or not s_email or not s_pw:
                     st.error("Please fill all fields.")
+                elif not _re.match(r"[^@]+@[^@]+\.[^@]+", s_email):
+                    st.error("Enter a valid email address.")
                 elif s_pw != s_pw2:
                     st.error("Passwords don't match.")
                 elif len(s_pw) < 8:
@@ -671,10 +688,12 @@ with st.sidebar:
             initials    = name[0].upper() if name else "U"
             avatar_html = f'<div class="user-avatar">{initials}</div>'
 
+        name_safe  = _html.escape(name)
+        email_safe = _html.escape(email_s)
         st.markdown(
             f'<div class="user-card">{avatar_html}'
-            f'<div><div class="user-name">{name}</div>'
-            f'<div class="user-email">{email_s}</div></div></div>',
+            f'<div><div class="user-name">{name_safe}</div>'
+            f'<div class="user-email">{email_safe}</div></div></div>',
             unsafe_allow_html=True)
 
         badge = (f'<span class="badge-premium">\u2b50 Premium</span>'
@@ -1076,9 +1095,14 @@ elif page == "\u2b50 Watchlist":
             st.markdown("&nbsp;", unsafe_allow_html=True)
             if st.button("Add \u2192", type="primary"):
                 if new_t and new_n:
-                    if db_add_watchlist(new_t.strip().upper(), new_n.strip(), cat):
-                        st.success(f"\u2705 {new_t.upper()} added!")
+                    t_clean = new_t.strip().upper()
+                    if not _valid_ticker(t_clean):
+                        st.error("Invalid ticker symbol. Use letters, digits, ^, =, . only (max 20 chars).")
+                    elif db_add_watchlist(t_clean, new_n.strip()[:60], cat):
+                        st.success(f"\u2705 {t_clean} added!")
                         st.rerun()
+                    else:
+                        st.error("Could not add ticker. It may already exist.")
                 else:
                     st.warning("Enter ticker and name.")
 
@@ -1106,11 +1130,11 @@ elif page == "\u2b50 Watchlist":
             cc     = cat_colors.get(item.get("category", "stock"), "#1e2440")
             cat_badge = (f'<span style="background:{cc};color:#7b8cde;'
                          f'padding:1px 7px;border-radius:4px;font-size:0.68rem">'
-                         f'{item.get("category","").upper()}</span>')
+                         f'{_html.escape(item.get("category","").upper())}</span>')
 
             c1, c2, c3, c4, c5 = st.columns([3, 2, 2, 1.5, 0.8])
             with c1:
-                st.markdown(f"**{item['ticker_name']}** {cat_badge}",
+                st.markdown(f"**{_html.escape(str(item['ticker_name']))}** {cat_badge}",
                             unsafe_allow_html=True)
                 st.caption(ticker)
             with c2:
@@ -1197,9 +1221,9 @@ elif page == "\U0001f4cb My Reports":
                 pin_icon = "\U0001f4cc " if n.get("is_pinned") else ""
                 tags_html = " ".join(
                     f'<span style="background:#1e2440;color:#7b8cde;'
-                    f'padding:1px 8px;border-radius:4px;font-size:0.72rem">{t}</span>'
+                    f'padding:1px 8px;border-radius:4px;font-size:0.72rem">{_html.escape(str(t))}</span>'
                     for t in (n.get("tags") or []))
-                label = f"{pin_icon}{n.get('title','Note')} \u2014 {n.get('updated_at','')[:10]}"
+                label = f"{pin_icon}{_html.escape(str(n.get('title','Note')))[:80]} \u2014 {n.get('updated_at','')[:10]}"
                 with st.expander(label):
                     if tags_html:
                         st.markdown(tags_html, unsafe_allow_html=True)
