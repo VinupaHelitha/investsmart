@@ -18,6 +18,13 @@ import plotly.graph_objects as go
 from datetime import datetime, date, timedelta
 from dotenv import load_dotenv
 import html as _html
+import time as _time
+
+try:
+    from streamlit_autorefresh import st_autorefresh as _st_autorefresh
+    _AUTOREFRESH_OK = True
+except ImportError:
+    _AUTOREFRESH_OK = False
 
 try:
     from supabase import create_client
@@ -765,15 +772,18 @@ def fetch_cse_stock_history(ticker: str, period: str = "1y"):
 def page_cse_market():
     st.title("\U0001f1f1\U0001f1f0 CSE Market")
 
-    # Tier banner
+    # Tier banner with refresh info
+    _loaded_at = datetime.now().strftime('%H:%M:%S')
     if is_paid_user():
-        st.caption(
-            "\u26a1 **Premium \u2014 Live Data:** prices refresh every minute. "
-            f"Last loaded: {datetime.now().strftime('%H:%M:%S')}")
+        st.success(
+            f"\u26a1 **Premium \u2014 Live Data** \u00b7 Auto-refreshes every **60 seconds** "
+            f"\u00b7 Last loaded: {_loaded_at}")
     else:
+        _next_ts = (datetime.now() + __import__('datetime').timedelta(minutes=15)).strftime('%H:%M')
         st.info(
-            "\u231b **15-minute delayed data** (Free plan). "
-            "\u2b50 Upgrade to **Premium** for live prices updated every minute.")
+            f"\u231b **15-minute delayed data** (Free plan) \u00b7 "
+            f"Next auto-refresh at ~{_next_ts} "
+            f"\u00b7 \u2b50 Upgrade to **Premium** for live data every 60 seconds.")
 
     # Pre-load board data (shared across all tabs)
     with st.spinner("Fetching CSE prices\u2026"):
@@ -782,7 +792,7 @@ def page_cse_market():
     tab_ov, tab_pb, tab_sd = st.tabs(
         ["\U0001f4ca Market Overview", "\U0001f4cb Price Board", "\U0001f4c8 Stock Detail"])
 
-    # ── TAB 1: Market Overview ────────────────────────────────────────────────
+    # -- TAB 1: Market Overview --------------------------------------------------
     with tab_ov:
         st.markdown("### Market Indices")
         with st.spinner("Loading indices\u2026"):
@@ -883,7 +893,7 @@ def page_cse_market():
                     paper_bgcolor="#0e1117", plot_bgcolor="#0e1117")
                 st.plotly_chart(fig_s, use_container_width=True)
 
-    # ── TAB 2: Price Board ────────────────────────────────────────────────────
+    # -- TAB 2: Price Board -------------------------------------------------------
     with tab_pb:
         st.markdown("### \U0001f1f1\U0001f1f0 CSE Full Price Board")
         st.caption("Prices via Yahoo Finance \u00b7 LKR = Sri Lankan Rupees")
@@ -1011,7 +1021,7 @@ def page_cse_market():
                         else:
                             st.error("DB write failed. Check Supabase connection.")
 
-    # ── TAB 3: Stock Detail ───────────────────────────────────────────────────
+    # -- TAB 3: Stock Detail ------------------------------------------------------
     with tab_sd:
         st.markdown("### \U0001f4c8 Individual Stock Analysis")
 
@@ -1228,6 +1238,23 @@ Reference actual numbers. 2\u20133 sentences per section. End with:
 _init_state()
 if _sb: _handle_oauth_callback()
 
+# -- AUTO-REFRESH (runs on every page load) -----------------------------------
+# Free users: refresh every 15 min | Paid users: every 60 s
+_refresh_interval_ms = 60_000 if is_paid_user() else 900_000
+if _AUTOREFRESH_OK:
+    _refresh_count = _st_autorefresh(
+        interval=_refresh_interval_ms,
+        limit=None,
+        key="global_autorefresh")
+else:
+    # Fallback: manual JS meta-refresh injected once per session
+    _refresh_secs = 60 if is_paid_user() else 900
+    if "meta_refresh_injected" not in st.session_state:
+        st.session_state["meta_refresh_injected"] = True
+        st.markdown(
+            f'<meta http-equiv="refresh" content="{_refresh_secs}">',
+            unsafe_allow_html=True)
+
 with st.sidebar:
     st.markdown("## \U0001f4c8 InvestSmart")
     st.markdown("*CSE Intelligence Platform*")
@@ -1273,9 +1300,13 @@ with st.sidebar:
     page = st.radio("Navigate", nav_pages, label_visibility="collapsed")
 
     st.markdown("---")
-    st.markdown(f"**Last updated:** {datetime.now().strftime('%H:%M:%S')}")
-    if st.button("\U0001f504 Refresh Data"):
+    _now_str  = datetime.now().strftime('%H:%M:%S')
+    _tier_lbl = "Premium (60s)" if is_paid_user() else "Free (15 min)"
+    st.markdown(f"**Last updated:** {_now_str}")
+    st.caption(f"\u26a1 Auto-refresh: {_tier_lbl}")
+    if st.button("\U0001f504 Refresh Data", use_container_width=True):
         st.cache_data.clear()
+        st.session_state.pop("meta_refresh_injected", None)
         st.rerun()
 
     st.markdown("---")
@@ -1309,7 +1340,8 @@ elif page == "\U0001f1f1\U0001f1f0 CSE Market":
 
 if page == "\U0001f3e0 Dashboard":
     st.title("\U0001f4ca Market Dashboard")
-    st.caption(f"Real-time overview \u00b7 {datetime.now().strftime('%A, %d %B %Y %H:%M')}")
+    _dash_tier = "Live (Premium)" if is_paid_user() else "15-min delayed (Free)"
+    st.caption(f"\u00b7 {datetime.now().strftime('%A, %d %B %Y %H:%M')} \u00b7 Data: {_dash_tier} \u00b7 Auto-refreshes automatically")
 
     with st.spinner("Loading market data\u2026"):
         gold   = current_price("GC=F")
