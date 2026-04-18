@@ -585,6 +585,567 @@ def fetch_worldbank(indicator: str, country: str = "LK") -> dict:
     except: return {}
 
 
+
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+# CSE (COLOMBO STOCK EXCHANGE) MODULE
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+
+# \u2500\u2500 Major CSE stock universe (Yahoo Finance .LK tickers) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+CSE_STOCKS = {
+    # Banking & Finance
+    "COMB.LK": ("Commercial Bank of Ceylon PLC",      "Banking"),
+    "HNB.LK":  ("Hatton National Bank PLC",           "Banking"),
+    "SAMP.LK": ("Sampath Bank PLC",                   "Banking"),
+    "NDB.LK":  ("NDB Bank PLC",                       "Banking"),
+    "DFCC.LK": ("DFCC Bank PLC",                      "Banking"),
+    "PABC.LK": ("Pan Asia Banking Corporation PLC",   "Banking"),
+    "UNION.LK":("Union Bank of Colombo PLC",          "Banking"),
+    "LOLC.LK": ("LOLC Holdings PLC",                  "Finance"),
+    "CFIN.LK": ("Central Finance Company PLC",        "Finance"),
+    "LLUB.LK": ("Lanka ORIX Leasing Company PLC",     "Finance"),
+    "LOFC.LK": ("LOLC Finance PLC",                   "Finance"),
+    # Diversified Holdings
+    "JKH.LK":  ("John Keells Holdings PLC",           "Diversified"),
+    "CARG.LK": ("Cargills (Ceylon) PLC",              "Diversified"),
+    "HPWR.LK": ("Hemas Holdings PLC",                 "Diversified"),
+    # Telecom
+    "DIAL.LK": ("Dialog Axiata PLC",                  "Telecom"),
+    "SLTL.LK": ("Sri Lanka Telecom PLC",              "Telecom"),
+    # Manufacturing
+    "CTC.LK":  ("Ceylon Tobacco Company PLC",         "Manufacturing"),
+    "DIPD.LK": ("Dipped Products PLC",                "Manufacturing"),
+    "REXP.LK": ("Richard Pieris Exports PLC",         "Manufacturing"),
+    "TJL.LK":  ("Textured Jersey Lanka PLC",          "Manufacturing"),
+    "ACL.LK":  ("ACL Cables PLC",                     "Manufacturing"),
+    "SELI.LK": ("Sierra Cables PLC",                  "Manufacturing"),
+    "LALU.LK": ("Lanka Aluminium Industries PLC",     "Manufacturing"),
+    # Plantation
+    "AGAL.LK": ("Agalawatte Plantations PLC",         "Plantation"),
+    "MAST.LK": ("Maskeliya Plantations PLC",          "Plantation"),
+    "BUKI.LK": ("Bukit Darah PLC",                    "Plantation"),
+    "ELPL.LK": ("Elpitiya Plantations PLC",           "Plantation"),
+    "KZOO.LK": ("Kotagala Plantations PLC",           "Plantation"),
+    "NAMU.LK": ("Namunukula Plantations PLC",         "Plantation"),
+    # Hotels & Leisure
+    "AHPL.LK": ("Asian Hotels and Properties PLC",    "Hotels"),
+    "BERU.LK": ("Beruwala Resorts PLC",               "Hotels"),
+    "AMSL.LK": ("Aitken Spence Hotel Holdings PLC",   "Hotels"),
+    # Healthcare
+    "ASIR.LK": ("Asiri Hospital Holdings PLC",        "Healthcare"),
+    "NHSL.LK": ("Nawaloka Hospitals PLC",             "Healthcare"),
+    # Energy
+    "LIOC.LK": ("Lanka IOC PLC",                      "Energy"),
+}
+
+CSE_SECTORS = ["All", "Banking", "Finance", "Diversified", "Telecom",
+               "Manufacturing", "Plantation", "Hotels", "Healthcare", "Energy"]
+
+# \u2500\u2500 User tier helpers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+def is_paid_user() -> bool:
+    """Returns True if current user has Premium tier."""
+    return get_profile().get("tier", "free") == "premium"
+
+# \u2500\u2500 CSE DB helpers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+def db_record_cse_prices(prices: list) -> bool:
+    """Store CSE daily prices to Supabase cse_price_history table."""
+    if not _sb or not prices:
+        return False
+    try:
+        today_str = date.today().isoformat()
+        rows = []
+        for p in prices:
+            if p.get("close"):
+                rows.append({
+                    "symbol":      p.get("ticker", ""),
+                    "price_date":  today_str,
+                    "open_price":  p.get("open"),
+                    "high_price":  p.get("high"),
+                    "low_price":   p.get("low"),
+                    "close_price": p["close"],
+                    "volume":      int(p.get("volume") or 0),
+                    "source":      "yahoo",
+                })
+        if rows:
+            _sb.table("cse_price_history").upsert(
+                rows, on_conflict="symbol,price_date").execute()
+        return True
+    except:
+        return False
+
+def db_get_cse_history(symbol: str, days: int = 365) -> list:
+    """Retrieve historical CSE prices from Supabase."""
+    if not _sb:
+        return []
+    try:
+        since = (date.today() - timedelta(days=days)).isoformat()
+        r = (_sb.table("cse_price_history")
+             .select("price_date,open_price,high_price,low_price,close_price,volume")
+             .eq("symbol", symbol)
+             .gte("price_date", since)
+             .order("price_date", desc=False)
+             .execute())
+        return r.data or []
+    except:
+        return []
+
+# \u2500\u2500 CSE price fetching (two TTLs: free=15 min, paid=1 min) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+def _do_fetch_cse_board() -> dict:
+    """Internal: batch-fetch all CSE stock prices via Yahoo Finance."""
+    tickers = list(CSE_STOCKS.keys())
+    results = {}
+    try:
+        data = yf.download(
+            tickers, period="5d", interval="1d",
+            auto_adjust=True, progress=False, group_by="ticker",
+            threads=True)
+        for ticker in tickers:
+            try:
+                if len(tickers) == 1:
+                    df = data.dropna(how="all")
+                elif isinstance(data.columns, pd.MultiIndex):
+                    df = data[ticker].dropna(how="all")
+                else:
+                    continue
+                if df is None or len(df) < 2:
+                    continue
+                last   = df.iloc[-1]
+                prev   = df.iloc[-2]
+                close  = float(last["Close"])
+                prev_c = float(prev["Close"])
+                change = close - prev_c
+                chg_p  = (change / prev_c * 100) if prev_c else 0.0
+                results[ticker] = {
+                    "ticker":     ticker,
+                    "symbol":     ticker.replace(".LK", ""),
+                    "close":      close,
+                    "change":     change,
+                    "change_pct": chg_p,
+                    "open":       float(last.get("Open",   close)),
+                    "high":       float(last.get("High",   close)),
+                    "low":        float(last.get("Low",    close)),
+                    "volume":     int(last.get("Volume", 0)),
+                }
+            except:
+                pass
+    except:
+        pass
+    return results
+
+@st.cache_data(ttl=900)
+def _cse_board_free() -> dict:
+    """CSE board \u2014 15-min cache for free users."""
+    return _do_fetch_cse_board()
+
+@st.cache_data(ttl=60)
+def _cse_board_paid() -> dict:
+    """CSE board \u2014 1-min cache for premium users."""
+    return _do_fetch_cse_board()
+
+def fetch_cse_board() -> dict:
+    """Return CSE board prices with appropriate TTL for user tier."""
+    return _cse_board_paid() if is_paid_user() else _cse_board_free()
+
+@st.cache_data(ttl=300)
+def fetch_cse_indices() -> dict:
+    """Fetch ASPI and S&P SL20 index data."""
+    idx = {}
+    for ticker, label in [("^CSEALL", "ASPI"), ("^SL20", "S&P SL20")]:
+        d = current_price(ticker)
+        if d.get("close"):
+            idx[label] = d
+    return idx
+
+@st.cache_data(ttl=300)
+def fetch_cse_stock_history(ticker: str, period: str = "1y"):
+    """Fetch historical OHLCV for one CSE stock."""
+    t = ticker if ticker.endswith(".LK") else ticker + ".LK"
+    return fetch_price(t, period)
+
+# \u2500\u2500 CSE Market Page \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+def page_cse_market():
+    st.title("\U0001f1f1\U0001f1f0 CSE Market")
+
+    # Tier banner
+    if is_paid_user():
+        st.caption(
+            "\u26a1 **Premium \u2014 Live Data:** prices refresh every minute. "
+            f"Last loaded: {datetime.now().strftime('%H:%M:%S')}")
+    else:
+        st.info(
+            "\u231b **15-minute delayed data** (Free plan). "
+            "\u2b50 Upgrade to **Premium** for live prices updated every minute.")
+
+    # Pre-load board data (shared across all tabs)
+    with st.spinner("Fetching CSE prices\u2026"):
+        board = fetch_cse_board()
+
+    tab_ov, tab_pb, tab_sd = st.tabs(
+        ["\U0001f4ca Market Overview", "\U0001f4cb Price Board", "\U0001f4c8 Stock Detail"])
+
+    # ── TAB 1: Market Overview ────────────────────────────────────────────────
+    with tab_ov:
+        st.markdown("### Market Indices")
+        with st.spinner("Loading indices\u2026"):
+            indices = fetch_cse_indices()
+        if indices:
+            icols = st.columns(len(indices))
+            for i, (name, d) in enumerate(indices.items()):
+                v   = d.get("close")
+                pct = d.get("change_pct", 0) or 0
+                with icols[i]:
+                    st.metric(name, fmt_index(v), f"{pct:+.2f}%" if v else None)
+        else:
+            st.info(
+                "\U0001f4e1 ASPI / S&P SL20 index tickers have limited availability on "
+                "Yahoo Finance. Individual stock prices are shown below.")
+
+        st.markdown("---")
+        st.markdown("### Market Summary")
+        advances  = sum(1 for d in board.values() if (d.get("change_pct") or 0) > 0)
+        declines  = sum(1 for d in board.values() if (d.get("change_pct") or 0) < 0)
+        unchanged = sum(1 for d in board.values() if (d.get("change_pct") or 0) == 0)
+        tracked   = len(board)
+        no_data   = len(CSE_STOCKS) - tracked
+
+        sc1, sc2, sc3, sc4, sc5 = st.columns(5)
+        sc1.metric("Stocks w/ Data", tracked)
+        sc2.metric("\U0001f7e2 Advances",  advances)
+        sc3.metric("\U0001f534 Declines",  declines)
+        sc4.metric("\u25a0 Unchanged",     unchanged)
+        sc5.metric("\u2753 No Data",       no_data)
+
+        if board:
+            sorted_all = sorted(
+                board.items(), key=lambda x: x[1].get("change_pct", 0) or 0, reverse=True)
+            col_g, col_l = st.columns(2)
+            with col_g:
+                st.markdown("#### \U0001f7e2 Top Gainers")
+                gainers = [item for item in sorted_all
+                           if (item[1].get("change_pct") or 0) > 0][:5]
+                if gainers:
+                    for ticker, d in gainers:
+                        cname = CSE_STOCKS.get(ticker, (ticker, ""))[0]
+                        chg   = d.get("change_pct", 0) or 0
+                        st.markdown(
+                            f'<div class="ticker-row">'
+                            f'<span style="font-weight:700;font-family:monospace;'
+                            f'min-width:65px">{d["symbol"]}</span>'
+                            f'<span style="color:#aaa;font-size:0.82rem;flex:1">'
+                            f'{_html.escape(cname[:32])}</span>'
+                            f'<span style="font-weight:600">LKR&nbsp;{d["close"]:,.2f}</span>'
+                            f'&nbsp;<span class="positive">+{chg:.2f}%</span>'
+                            f'</div>', unsafe_allow_html=True)
+                else:
+                    st.caption("No advances today.")
+            with col_l:
+                st.markdown("#### \U0001f534 Top Losers")
+                losers = [item for item in reversed(sorted_all)
+                          if (item[1].get("change_pct") or 0) < 0][:5]
+                if losers:
+                    for ticker, d in losers:
+                        cname = CSE_STOCKS.get(ticker, (ticker, ""))[0]
+                        chg   = d.get("change_pct", 0) or 0
+                        st.markdown(
+                            f'<div class="ticker-row">'
+                            f'<span style="font-weight:700;font-family:monospace;'
+                            f'min-width:65px">{d["symbol"]}</span>'
+                            f'<span style="color:#aaa;font-size:0.82rem;flex:1">'
+                            f'{_html.escape(cname[:32])}</span>'
+                            f'<span style="font-weight:600">LKR&nbsp;{d["close"]:,.2f}</span>'
+                            f'&nbsp;<span class="negative">{chg:.2f}%</span>'
+                            f'</div>', unsafe_allow_html=True)
+                else:
+                    st.caption("No declines today.")
+
+            # Sector performance bar chart
+            st.markdown("---")
+            st.markdown("#### Sector Performance")
+            sector_data = {}
+            for ticker, d in board.items():
+                sec = CSE_STOCKS.get(ticker, ("", "Unknown"))[1]
+                sector_data.setdefault(sec, []).append(d.get("change_pct", 0) or 0)
+            if sector_data:
+                sec_avgs = {s: sum(v) / len(v) for s, v in sector_data.items() if v}
+                sec_df   = pd.DataFrame({
+                    "Sector": list(sec_avgs.keys()),
+                    "Avg Change %": [round(v, 2) for v in sec_avgs.values()]
+                }).sort_values("Avg Change %", ascending=False)
+                colors = ["#00d26a" if v >= 0 else "#ff4b4b" for v in sec_df["Avg Change %"]]
+                fig_s = go.Figure(go.Bar(
+                    x=sec_df["Sector"], y=sec_df["Avg Change %"],
+                    marker_color=colors,
+                    text=[f"{v:+.2f}%" for v in sec_df["Avg Change %"]],
+                    textposition="outside"))
+                fig_s.update_layout(
+                    template="plotly_dark", height=300,
+                    margin=dict(l=10, r=10, t=20, b=20),
+                    yaxis_ticksuffix="%",
+                    paper_bgcolor="#0e1117", plot_bgcolor="#0e1117")
+                st.plotly_chart(fig_s, use_container_width=True)
+
+    # ── TAB 2: Price Board ────────────────────────────────────────────────────
+    with tab_pb:
+        st.markdown("### \U0001f1f1\U0001f1f0 CSE Full Price Board")
+        st.caption("Prices via Yahoo Finance \u00b7 LKR = Sri Lankan Rupees")
+
+        pf1, pf2, pf3 = st.columns([3, 2, 1])
+        with pf1:
+            search = st.text_input(
+                "\U0001f50d Search", placeholder="Ticker or company name\u2026",
+                key="cse_search", label_visibility="collapsed")
+        with pf2:
+            sec_flt = st.selectbox(
+                "Sector", CSE_SECTORS, key="cse_sector",
+                label_visibility="collapsed")
+        with pf3:
+            sort_by = st.selectbox(
+                "Sort", ["Change %", "Price", "Volume", "Name"],
+                key="cse_sort", label_visibility="collapsed")
+
+        if not board:
+            st.warning(
+                "\u26a0\ufe0f Could not fetch CSE price data. Markets may be closed or "
+                "Yahoo Finance may not yet have today's data. Try refreshing later.")
+        else:
+            rows = []
+            for ticker, (company, sector) in CSE_STOCKS.items():
+                if sec_flt != "All" and sector != sec_flt:
+                    continue
+                q = search.strip().lower()
+                if q and q not in company.lower() and q not in ticker.lower():
+                    continue
+                d = board.get(ticker, {})
+                rows.append({
+                    "ticker":   ticker,
+                    "symbol":   ticker.replace(".LK", ""),
+                    "company":  company,
+                    "sector":   sector,
+                    "close":    d.get("close"),
+                    "change":   d.get("change"),
+                    "chg_pct":  d.get("change_pct"),
+                    "open":     d.get("open"),
+                    "high":     d.get("high"),
+                    "low":      d.get("low"),
+                    "volume":   d.get("volume"),
+                    "has_data": bool(d.get("close")),
+                })
+
+            def _skey(r):
+                if sort_by == "Change %": return r.get("chg_pct") or -999
+                if sort_by == "Price":    return r.get("close")   or 0
+                if sort_by == "Volume":   return r.get("volume")  or 0
+                return r.get("company", "")
+            rows.sort(key=_skey, reverse=(sort_by != "Name"))
+
+            shown    = [r for r in rows if r["has_data"]]
+            no_data_r = [r for r in rows if not r["has_data"]]
+            st.caption(
+                f"Showing **{len(shown)}** stocks with data"
+                + (f" + {len(no_data_r)} with no data" if no_data_r else ""))
+
+            # Table header
+            st.markdown(
+                '<div style="display:flex;gap:8px;padding:6px 4px;'
+                'color:#7b82a8;font-size:0.73rem;font-weight:700;'
+                'border-bottom:2px solid #2a2f4a;margin-bottom:2px">'
+                '<span style="min-width:60px">TICKER</span>'
+                '<span style="flex:1">COMPANY</span>'
+                '<span style="min-width:55px;text-align:center">SECTOR</span>'
+                '<span style="min-width:95px;text-align:right">PRICE (LKR)</span>'
+                '<span style="min-width:72px;text-align:right">CHG %</span>'
+                '<span style="min-width:65px;text-align:right">VOLUME</span>'
+                '<span style="min-width:85px;text-align:right">HIGH/LOW</span>'
+                '</div>', unsafe_allow_html=True)
+
+            for r in shown:
+                chg  = r["chg_pct"] or 0
+                cls  = "positive" if chg > 0 else ("negative" if chg < 0 else "neutral")
+                arr  = "\u25b2" if chg > 0 else ("\u25bc" if chg < 0 else "\u2014")
+                vol  = r["volume"] or 0
+                vfmt = (f"{vol/1_000_000:.1f}M" if vol >= 1_000_000
+                        else (f"{vol/1_000:.0f}K" if vol >= 1_000 else str(vol)))
+                hi   = r["high"]  or r["close"]
+                lo   = r["low"]   or r["close"]
+                st.markdown(
+                    f'<div class="ticker-row">'
+                    f'<span style="font-weight:700;font-family:monospace;min-width:60px">'
+                    f'{r["symbol"]}</span>'
+                    f'<span style="color:#c8cfea;font-size:0.82rem;flex:1;'
+                    f'white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'
+                    f'{_html.escape(r["company"])}</span>'
+                    f'<span style="background:#1a1e30;padding:1px 6px;border-radius:4px;'
+                    f'font-size:0.68rem;color:#7b82a8;min-width:55px;text-align:center;'
+                    f'white-space:nowrap">{r["sector"]}</span>'
+                    f'<span style="font-weight:700;min-width:95px;text-align:right">'
+                    f'LKR {r["close"]:,.2f}</span>'
+                    f'<span class="{cls}" style="min-width:72px;text-align:right">'
+                    f'{arr}{chg:+.2f}%</span>'
+                    f'<span style="color:#7b82a8;font-size:0.78rem;min-width:65px;'
+                    f'text-align:right">{vfmt}</span>'
+                    f'<span style="color:#556;font-size:0.73rem;min-width:85px;'
+                    f'text-align:right">{hi:,.0f}/{lo:,.0f}</span>'
+                    f'</div>', unsafe_allow_html=True)
+
+            if no_data_r:
+                with st.expander(f"\u2753 {len(no_data_r)} stocks without Yahoo Finance data"):
+                    for r in no_data_r:
+                        st.caption(f"\u2022 **{r['symbol']}** \u2014 {r['company']}")
+
+            st.markdown("")
+            if _sb:
+                rc1, rc2 = st.columns([3, 1])
+                with rc1:
+                    st.caption(
+                        "\U0001f4be Click to save today's closing prices to the "
+                        "database for long-term historical records.")
+                with rc2:
+                    if st.button("\U0001f4be Record Today's Prices",
+                                 key="cse_record", use_container_width=True):
+                        to_rec = [
+                            {**board[t], "ticker": t}
+                            for t in CSE_STOCKS
+                            if t in board and board[t].get("close")]
+                        if db_record_cse_prices(to_rec):
+                            st.success(
+                                f"\u2705 Recorded {len(to_rec)} stock prices!")
+                        else:
+                            st.error("DB write failed. Check Supabase connection.")
+
+    # ── TAB 3: Stock Detail ───────────────────────────────────────────────────
+    with tab_sd:
+        st.markdown("### \U0001f4c8 Individual Stock Analysis")
+
+        with_data    = [t for t in CSE_STOCKS if t in board and board[t].get("close")]
+        without_data = [t for t in CSE_STOCKS if t not in with_data]
+        ordered_t    = with_data + without_data
+        options_t    = [f"{t.replace('.LK','')} \u2014 {CSE_STOCKS[t][0]}"
+                        for t in ordered_t]
+        sel_label    = st.selectbox("Select stock", options_t, key="cse_detail_select")
+        sel_idx      = options_t.index(sel_label)
+        sel_tick     = ordered_t[sel_idx]
+        company, sector = CSE_STOCKS.get(sel_tick, (sel_tick, ""))
+        symbol          = sel_tick.replace(".LK", "")
+        d               = board.get(sel_tick, {})
+
+        st.markdown(f"#### {symbol} \u2014 {_html.escape(company)}")
+        st.caption(
+            f"Sector: **{sector}** \u00b7 CSE listed "
+            f"\u00b7 Yahoo ticker: `{sel_tick}`")
+
+        if d.get("close"):
+            chg  = d.get("change_pct", 0) or 0
+            arr  = "\u25b2" if chg > 0 else ("\u25bc" if chg < 0 else "\u2014")
+            vol  = d.get("volume", 0) or 0
+            vfmt = (f"{vol/1_000_000:.1f}M" if vol >= 1_000_000
+                    else (f"{vol/1_000:.0f}K" if vol >= 1_000 else str(int(vol))))
+            m1, m2, m3, m4, m5 = st.columns(5)
+            m1.metric("Price (LKR)", f"{d['close']:,.2f}", f"{arr} {chg:+.2f}%")
+            m2.metric("Open",  f"{d.get('open',  d['close']):,.2f}")
+            m3.metric("High",  f"{d.get('high',  d['close']):,.2f}")
+            m4.metric("Low",   f"{d.get('low',   d['close']):,.2f}")
+            m5.metric("Volume", vfmt)
+
+            if is_logged_in():
+                if st.button(f"\u2b50 Add {symbol} to Watchlist",
+                             key=f"cse_wl_{symbol}"):
+                    if db_add_watchlist(sel_tick, company, "cse"):
+                        st.success(f"\u2705 {symbol} added to watchlist!")
+                    else:
+                        st.warning("Already in watchlist or failed to add.")
+            else:
+                st.caption("\U0001f510 Sign in to add to watchlist.")
+        else:
+            st.warning(
+                f"\u26a0\ufe0f No price data for **{symbol}** on Yahoo Finance. "
+                "Try another stock or check back later.")
+
+        # Historical chart
+        st.markdown("---")
+        st.markdown("#### Price Chart")
+        p_opts = {"1 Week": "5d", "1 Month": "1mo", "3 Months": "3mo",
+                  "6 Months": "6mo", "1 Year": "1y", "2 Years": "2y"}
+        p_choice = st.radio(
+            "Period", list(p_opts.keys()), horizontal=True,
+            index=3, key="cse_chart_period")
+
+        with st.spinner("Loading chart\u2026"):
+            hist_yf = fetch_cse_stock_history(sel_tick, p_opts[p_choice])
+            hist_db = db_get_cse_history(sel_tick, 730)
+
+        if hist_yf is not None and not hist_yf.empty:
+            # Candlestick
+            fig_c = go.Figure(go.Candlestick(
+                x=hist_yf.index,
+                open=hist_yf["Open"],  high=hist_yf["High"],
+                low=hist_yf["Low"],    close=hist_yf["Close"],
+                increasing_line_color="#00d26a",
+                decreasing_line_color="#ff4b4b",
+                name=symbol))
+            fig_c.update_layout(
+                title=f"{symbol} \u2014 {p_choice} Candlestick (LKR)",
+                template="plotly_dark", height=400,
+                margin=dict(l=20, r=20, t=40, b=20),
+                xaxis_rangeslider_visible=False,
+                paper_bgcolor="#0e1117", plot_bgcolor="#0e1117")
+            st.plotly_chart(fig_c, use_container_width=True)
+
+            if "Volume" in hist_yf.columns:
+                fig_v = go.Figure(go.Bar(
+                    x=hist_yf.index, y=hist_yf["Volume"],
+                    marker_color="#3b4fd9", name="Volume", opacity=0.8))
+                fig_v.update_layout(
+                    title="Trading Volume",
+                    template="plotly_dark", height=180,
+                    margin=dict(l=20, r=20, t=30, b=20),
+                    paper_bgcolor="#0e1117", plot_bgcolor="#0e1117")
+                st.plotly_chart(fig_v, use_container_width=True)
+
+            base = float(hist_yf["Close"].iloc[0])
+            if base:
+                pct_s = ((hist_yf["Close"] - base) / base * 100).round(2)
+                fig_r = go.Figure(go.Scatter(
+                    x=hist_yf.index, y=pct_s, mode="lines",
+                    name="Return %",
+                    line=dict(color="#c084fc", width=2),
+                    fill="tozeroy",
+                    fillcolor="rgba(192,132,252,0.08)"))
+                fig_r.update_layout(
+                    title=f"Cumulative Return % \u2014 {p_choice}",
+                    template="plotly_dark", height=200,
+                    margin=dict(l=20, r=20, t=30, b=20),
+                    yaxis_ticksuffix="%",
+                    paper_bgcolor="#0e1117", plot_bgcolor="#0e1117")
+                st.plotly_chart(fig_r, use_container_width=True)
+        else:
+            st.info(
+                f"\U0001f4c9 Chart not available for {symbol} "
+                "on Yahoo Finance for this period.")
+
+        st.markdown("---")
+        st.markdown("#### Recorded Price History (Database)")
+        if hist_db:
+            st.caption(f"\U0001f4be {len(hist_db)} days recorded in database")
+            dbf = pd.DataFrame(hist_db).rename(columns={
+                "price_date": "Date", "open_price": "Open",
+                "high_price": "High", "low_price": "Low",
+                "close_price": "Close (LKR)", "volume": "Volume"})
+            show_cols = [c for c in
+                         ["Date", "Close (LKR)", "Open", "High", "Low", "Volume"]
+                         if c in dbf.columns]
+            st.dataframe(dbf[show_cols].tail(60),
+                         use_container_width=True, hide_index=True)
+            csv_bytes = dbf[show_cols].to_csv(index=False).encode("utf-8")
+            st.download_button(
+                "\u2b07\ufe0f Download CSV", csv_bytes,
+                file_name=f"{symbol}_history.csv", mime="text/csv",
+                key=f"dl_{symbol}")
+        else:
+            st.info(
+                "\U0001f4be No history recorded yet. "
+                "Go to **Price Board** and click \u2018Record Today\u2019s Prices\u2019 "
+                "to start building your historical database.")
+
+
 # \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # AI BRIEFING
 # \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
@@ -703,7 +1264,7 @@ with st.sidebar:
         st.markdown("")
 
     # \u2500\u2500 Navigation \u2500\u2500
-    free_pages = ["\U0001f3e0 Dashboard", "\U0001f947 Gold & Silver", "\U0001f30d Global Markets", "\U0001f4f0 News Feed"]
+    free_pages = ["\U0001f3e0 Dashboard", "\U0001f1f1\U0001f1f0 CSE Market", "\U0001f947 Gold & Silver", "\U0001f30d Global Markets", "\U0001f4f0 News Feed"]
     if is_logged_in():
         nav_pages = free_pages + ["\U0001f916 AI Briefing", "\u2b50 Watchlist", "\U0001f4cb My Reports", "\u2139\ufe0f About"]
     else:
@@ -727,7 +1288,7 @@ with st.sidebar:
             st.rerun()
 
     st.markdown("")
-    st.caption("Data: Yahoo Finance \u00b7 FRED \u00b7 World Bank \u00b7 NewsAPI")
+    st.caption("Data: Yahoo Finance (.LK) \u00b7 CSE \u00b7 FRED \u00b7 World Bank \u00b7 NewsAPI")
     st.caption("AI: Claude \u00b7 OpenAI \u00b7 Gemini")
 
 # \u2500\u2500 Redirect locked pages to auth \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
@@ -743,6 +1304,9 @@ if st.session_state.get("show_auth") and not is_logged_in():
 # \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # PAGE: DASHBOARD
 # \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+elif page == "\U0001f1f1\U0001f1f0 CSE Market":
+    page_cse_market()
+
 if page == "\U0001f3e0 Dashboard":
     st.title("\U0001f4ca Market Dashboard")
     st.caption(f"Real-time overview \u00b7 {datetime.now().strftime('%A, %d %B %Y %H:%M')}")
@@ -777,6 +1341,19 @@ if page == "\U0001f3e0 Dashboard":
         v = vix.get("close")
         st.metric("VIX Fear Index", f"{v:.2f}" if v else "N/A",
                   metric_delta(vix), delta_color="inverse")
+
+    # CSE indices row
+    aspi_d = current_price("^CSEALL")
+    sl20_d = current_price("^SL20")
+    if aspi_d.get("close") or sl20_d.get("close"):
+        st.markdown("#### \U0001f1f1\U0001f1f0 CSE Indices")
+        ci1, ci2, ci3, ci4 = st.columns(4)
+        with ci1:
+            v = aspi_d.get("close")
+            st.metric("ASPI", fmt_index(v), metric_delta(aspi_d) if v else None)
+        with ci2:
+            v = sl20_d.get("close")
+            st.metric("S&P SL20", fmt_index(v), metric_delta(sl20_d) if v else None)
 
     st.markdown("---")
     col_a, col_b, col_c = st.columns(3)
@@ -1260,7 +1837,7 @@ and generates daily AI briefings to help you make better-informed investment dec
 
 | Source | What We Use It For |
 |--------|--------------------|
-| Yahoo Finance | 40+ tickers \u2014 gold, silver, CSE indices, forex, global markets |
+| Yahoo Finance | 40+ tickers \u2014 gold, silver, CSE (.LK stocks), indices, forex, global markets |
 | FRED (Federal Reserve) | US macro data: interest rates, inflation, yield curve |
 | World Bank Open API | Sri Lanka macro: GDP, CPI, FDI, remittances |
 | NewsAPI | 6 categories of financial news |
@@ -1282,15 +1859,18 @@ and generates daily AI briefings to help you make better-informed investment dec
 
 ## Account Features (Free vs Premium)
 
-| Feature | Free | Logged In |
-|---------|------|-----------|
-| Dashboard | \u2705 | \u2705 |
-| Gold & Silver | \u2705 | \u2705 |
-| Global Markets | \u2705 | \u2705 |
-| News Feed | \u2705 | \u2705 |
-| AI Briefing | \u2014 | \u2705 |
-| Watchlist | \u2014 | \u2705 |
-| My Reports & Notes | \u2014 | \u2705 |
+| Feature | Free | Logged In | Premium |
+|---------|------|-----------|---------|
+| Dashboard (ASPI/SL20) | \u2705 | \u2705 | \u2705 |
+| CSE Market (15-min data) | \u2705 | \u2705 | \u2014 |
+| CSE Market (Live 1-min) | \u2014 | \u2014 | \u2705 |
+| Gold & Silver | \u2705 | \u2705 | \u2705 |
+| Global Markets | \u2705 | \u2705 | \u2705 |
+| News Feed | \u2705 | \u2705 | \u2705 |
+| AI Briefing | \u2014 | \u2705 | \u2705 |
+| Watchlist | \u2014 | \u2705 | \u2705 |
+| My Reports & Notes | \u2014 | \u2705 | \u2705 |
+| CSE Price Recording (DB) | \u2014 | \u2705 | \u2705 |
 
 ## Disclaimer
 
