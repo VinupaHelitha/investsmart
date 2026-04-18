@@ -696,46 +696,48 @@ def db_get_cse_history(symbol: str, days: int = 365) -> list:
         return []
 
 # \u2500\u2500 CSE price fetching (two TTLs: free=15 min, paid=1 min) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+def _fetch_one_cse(ticker: str) -> tuple:
+    """Fetch a single CSE stock price via yf.Ticker.history() (reliable)."""
+    try:
+        hist = yf.Ticker(ticker).history(period="5d", auto_adjust=True)
+        if hist is None or len(hist) < 2:
+            return ticker, None
+        last   = hist.iloc[-1]
+        prev   = hist.iloc[-2]
+        close  = float(last["Close"])
+        prev_c = float(prev["Close"])
+        if close <= 0 or prev_c <= 0:
+            return ticker, None
+        change = close - prev_c
+        chg_p  = (change / prev_c * 100) if prev_c else 0.0
+        return ticker, {
+            "ticker":     ticker,
+            "symbol":     ticker.replace(".LK", ""),
+            "close":      close,
+            "change":     change,
+            "change_pct": chg_p,
+            "open":       float(last.get("Open",   close)),
+            "high":       float(last.get("High",   close)),
+            "low":        float(last.get("Low",    close)),
+            "volume":     int(last.get("Volume", 0) or 0),
+        }
+    except:
+        return ticker, None
+
 def _do_fetch_cse_board() -> dict:
-    """Internal: batch-fetch all CSE stock prices via Yahoo Finance."""
+    """Fetch all CSE stock prices concurrently via individual yf.Ticker calls."""
+    from concurrent.futures import ThreadPoolExecutor, as_completed
     tickers = list(CSE_STOCKS.keys())
     results = {}
-    try:
-        data = yf.download(
-            tickers, period="5d", interval="1d",
-            auto_adjust=True, progress=False, group_by="ticker",
-            threads=True)
-        for ticker in tickers:
+    with ThreadPoolExecutor(max_workers=10) as ex:
+        futures = {ex.submit(_fetch_one_cse, t): t for t in tickers}
+        for fut in as_completed(futures, timeout=25):
             try:
-                if len(tickers) == 1:
-                    df = data.dropna(how="all")
-                elif isinstance(data.columns, pd.MultiIndex):
-                    df = data[ticker].dropna(how="all")
-                else:
-                    continue
-                if df is None or len(df) < 2:
-                    continue
-                last   = df.iloc[-1]
-                prev   = df.iloc[-2]
-                close  = float(last["Close"])
-                prev_c = float(prev["Close"])
-                change = close - prev_c
-                chg_p  = (change / prev_c * 100) if prev_c else 0.0
-                results[ticker] = {
-                    "ticker":     ticker,
-                    "symbol":     ticker.replace(".LK", ""),
-                    "close":      close,
-                    "change":     change,
-                    "change_pct": chg_p,
-                    "open":       float(last.get("Open",   close)),
-                    "high":       float(last.get("High",   close)),
-                    "low":        float(last.get("Low",    close)),
-                    "volume":     int(last.get("Volume", 0)),
-                }
+                ticker, data = fut.result()
+                if data:
+                    results[ticker] = data
             except:
                 pass
-    except:
-        pass
     return results
 
 @st.cache_data(ttl=900)
@@ -914,8 +916,29 @@ def page_cse_market():
 
         if not board:
             st.warning(
-                "\u26a0\ufe0f Could not fetch CSE price data. Markets may be closed or "
-                "Yahoo Finance may not yet have today's data. Try refreshing later.")
+                "\u26a0\ufe0f No CSE price data available right now. "
+                "This is normal on weekends/public holidays when markets are closed. "
+                "Yahoo Finance serves the last available trading day's prices \u2014 "
+                "try clicking \U0001f504 Refresh Data in the sidebar.")
+            # Show last recorded prices from Supabase as fallback
+            if _sb:
+                st.markdown("**Showing last recorded prices from database:**")
+                try:
+                    last_rec = (_sb.table("cse_price_history")
+                                .select("symbol,price_date,close_price,volume")
+                                .order("price_date", desc=True)
+                                .limit(35)
+                                .execute())
+                    if last_rec.data:
+                        fallback_df = pd.DataFrame(last_rec.data).rename(columns={
+                            "symbol": "Ticker", "price_date": "Date",
+                            "close_price": "Close (LKR)", "volume": "Volume"})
+                        st.dataframe(fallback_df, use_container_width=True, hide_index=True)
+                    else:
+                        st.caption("No recorded prices in database yet. "
+                                   "Use the Price Board tab to record prices on a trading day.")
+                except:
+                    pass
         else:
             rows = []
             for ticker, (company, sector) in CSE_STOCKS.items():
