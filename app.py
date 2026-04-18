@@ -1,11 +1,11 @@
 """
-app.py â InvestSmart v2.0
+app.py \u2014 InvestSmart v2.0
 Streamlit dashboard + full authentication for CSE & global market intelligence.
 
-Pages (Free):    Dashboard Â· Gold & Silver Â· Global Markets Â· News Feed Â· About
-Pages (Premium): AI Briefing Â· Watchlist Â· My Reports  (require login)
+Pages (Free):    Dashboard \u00b7 Gold & Silver \u00b7 Global Markets \u00b7 News Feed \u00b7 About
+Pages (Premium): AI Briefing \u00b7 Watchlist \u00b7 My Reports  (require login)
 
-Auth:  Supabase â Email/Password Â· Google OAuth Â· Phone SMS OTP
+Auth:  Supabase \u2014 Email/Password \u00b7 Google OAuth \u00b7 Phone SMS OTP
 """
 
 import os
@@ -26,9 +26,9 @@ except ImportError:
 
 load_dotenv()
 
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # SECRETS
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 def get_secret(key: str, default: str = "") -> str:
     try:
         return st.secrets.get(key, os.getenv(key, default))
@@ -44,12 +44,12 @@ SUPABASE_URL      = get_secret("SUPABASE_URL")
 SUPABASE_KEY      = get_secret("SUPABASE_KEY")
 APP_URL           = "https://investsmart-uznzrnzf4rdkmthkmtuofc.streamlit.app"
 
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # PAGE CONFIG
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 st.set_page_config(
-    page_title="InvestSmart â CSE Intelligence",
-    page_icon="ð",
+    page_title="InvestSmart \u2014 CSE Intelligence",
+    page_icon="\U0001f4c8",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -66,7 +66,7 @@ st.markdown("""
   div[data-testid="stMetric"] { background:#1e2130; border-radius:10px; padding:12px; }
   div[data-testid="stMetric"] label { font-size:0.78rem !important; }
 
-  /* ââ Auth ââ */
+  /* \u2500\u2500 Auth \u2500\u2500 */
   .auth-logo { text-align:center; padding:24px 0 8px 0; }
   .auth-logo .icon { font-size:3rem; }
   .auth-logo .brand { font-size:1.7rem; font-weight:800; color:#e0e4ff; margin-top:4px; }
@@ -105,9 +105,9 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # FORMATTERS
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 def fmt_lkr(value: float | None) -> str:
     if value is None: return "N/A"
     if value >= 1_000_000: return f"LKR {value/1_000_000:.2f}M"
@@ -120,9 +120,9 @@ def fmt_index(value: float | None) -> str:
     if value >= 1_000:   return f"{value:,.0f}"
     return f"{value:,.2f}"
 
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # SUPABASE CLIENT
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 @st.cache_resource
 def _get_sb():
     if not _SUPABASE_OK or not SUPABASE_URL or not SUPABASE_KEY:
@@ -131,7 +131,7 @@ def _get_sb():
 
 _sb = _get_sb()
 
-# ââ Auth state helpers âââââââââââââââââââââââââââââ
+# \u2500\u2500 Auth state helpers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 def _init_state():
     defaults = {
         "auth_user": None, "auth_session": None, "auth_profile": None,
@@ -185,7 +185,7 @@ def do_logout():
     st.session_state["show_auth"] = False
     st.rerun()
 
-# ââ DB helpers ââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500 DB helpers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 def db_get_watchlist():
     user = get_user()
     if not user or not _sb: return []
@@ -274,9 +274,9 @@ def db_delete_note(nid: int):
         _sb.table("user_notes").delete().eq("id", nid).eq("user_id", user.id).execute()
     except: pass
 
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # AUTH PAGE UI
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 _G_ICON = """<svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
 <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0
  14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
@@ -301,16 +301,16 @@ def _google_btn(label: str):
             <div class="google-btn">{_G_ICON}&nbsp; {label}</div>
           </a></div>""", unsafe_allow_html=True)
     except:
-        st.caption("Google sign-in not yet configured â use email or phone below.")
+        st.caption("Google sign-in not yet configured \u2014 use email or phone below.")
 
 def show_auth_page():
-    """Full-screen auth page: Sign In Â· Create Account Â· Phone Â· Reset."""
+    """Full-screen auth page: Sign In \u00b7 Create Account \u00b7 Phone \u00b7 Reset."""
     _, col, _ = st.columns([1, 1.5, 1])
     with col:
         # Logo
         st.markdown("""
         <div class="auth-logo">
-          <div class="icon">ð</div>
+          <div class="icon">\U0001f4c8</div>
           <div class="brand">InvestSmart</div>
           <div class="tagline">CSE Intelligence Platform</div>
         </div>""", unsafe_allow_html=True)
@@ -322,10 +322,10 @@ def show_auth_page():
             st.success(st.session_state.pop("auth_success"))
 
         tab_si, tab_su, tab_ph, tab_pw = st.tabs(
-            ["ð Sign In", "â¨ Create Account", "ð± Phone OTP", "ð Reset Password"]
+            ["\U0001f510 Sign In", "\u2728 Create Account", "\U0001f4f1 Phone OTP", "\U0001f511 Reset Password"]
         )
 
-        # ââ SIGN IN ââââââââââââââââââââââââââââââââââ
+        # \u2500\u2500 SIGN IN \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
         with tab_si:
             _google_btn("Continue with Google")
             st.markdown('<div class="or-divider">or sign in with email</div>',
@@ -336,7 +336,7 @@ def show_auth_page():
                                          key="si_email")
                 password = st.text_input("Password", type="password",
                                          placeholder="Your password", key="si_pw")
-                ok = st.form_submit_button("Sign In â", use_container_width=True,
+                ok = st.form_submit_button("Sign In \u2192", use_container_width=True,
                                            type="primary")
             if ok:
                 if not email or not password:
@@ -353,13 +353,13 @@ def show_auth_page():
                     except Exception as e:
                         err = str(e).lower()
                         if "invalid" in err:
-                            st.error("â Invalid email or password.")
+                            st.error("\u274c Invalid email or password.")
                         elif "not confirmed" in err:
-                            st.warning("ð§ Please verify your email before signing in.")
+                            st.warning("\U0001f4e7 Please verify your email before signing in.")
                         else:
                             st.error(f"Sign-in failed: {e}")
 
-        # ââ CREATE ACCOUNT ââââââââââââââââââââââââââââ
+        # \u2500\u2500 CREATE ACCOUNT \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
         with tab_su:
             _google_btn("Sign up with Google")
             st.markdown('<div class="or-divider">or create with email</div>',
@@ -374,7 +374,7 @@ def show_auth_page():
                                         placeholder="Repeat password")
                 agreed  = st.checkbox(
                     "I agree to the Terms of Service and Privacy Policy")
-                sub = st.form_submit_button("Create Account â",
+                sub = st.form_submit_button("Create Account \u2192",
                                             use_container_width=True, type="primary")
             if sub:
                 if not name or not s_email or not s_pw:
@@ -399,22 +399,22 @@ def show_auth_page():
                             st.rerun()
                         elif r.user:
                             st.success(
-                                "â Account created! Check your email to verify, then sign in.")
+                                "\u2705 Account created! Check your email to verify, then sign in.")
                         else:
                             st.error("Sign-up failed. Email may already be registered.")
                     except Exception as e:
                         st.error(f"Sign-up failed: {e}")
 
-        # ââ PHONE OTP ââââââââââââââââââââââââââââââââ
+        # \u2500\u2500 PHONE OTP \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
         with tab_ph:
-            st.caption("Enter your mobile number â we'll send a 6-digit SMS code.")
-            st.info("Include country code Â· e.g. **+94 77 123 4567** for Sri Lanka")
+            st.caption("Enter your mobile number \u2014 we'll send a 6-digit SMS code.")
+            st.info("Include country code \u00b7 e.g. **+94 77 123 4567** for Sri Lanka")
 
             if st.session_state.get("phone_step", 1) == 1:
                 with st.form("f_phone"):
                     ph = st.text_input("Mobile number", placeholder="+94771234567",
                                        value=st.session_state.get("phone_number", ""))
-                    send = st.form_submit_button("Send SMS Code â",
+                    send = st.form_submit_button("Send SMS Code \u2192",
                                                  use_container_width=True, type="primary")
                 if send:
                     ph = ph.strip()
@@ -434,7 +434,7 @@ def show_auth_page():
                 with st.form("f_otp"):
                     otp = st.text_input("6-digit code", placeholder="123456",
                                         max_chars=6)
-                    verify = st.form_submit_button("Verify & Sign In â",
+                    verify = st.form_submit_button("Verify & Sign In \u2192",
                                                    use_container_width=True,
                                                    type="primary")
                 if verify:
@@ -452,16 +452,16 @@ def show_auth_page():
                                 st.error("Invalid or expired code.")
                         except Exception as e:
                             st.error(f"Verification failed: {e}")
-                if st.button("â Change number"):
+                if st.button("\u2190 Change number"):
                     st.session_state["phone_step"] = 1
                     st.rerun()
 
-        # ââ RESET PASSWORD âââââââââââââââââââââââââââ
+        # \u2500\u2500 RESET PASSWORD \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
         with tab_pw:
             st.caption("We'll email you a link to reset your password.")
             with st.form("f_reset"):
                 r_email = st.text_input("Registered email", placeholder="you@example.com")
-                send_r  = st.form_submit_button("Send Reset Link â",
+                send_r  = st.form_submit_button("Send Reset Link \u2192",
                                                 use_container_width=True, type="primary")
             if send_r:
                 if not r_email:
@@ -470,33 +470,33 @@ def show_auth_page():
                     try:
                         _sb.auth.reset_password_email(
                             r_email, options={"redirect_to": APP_URL})
-                        st.success("â Reset link sent! Check your inbox.")
+                        st.success("\u2705 Reset link sent! Check your inbox.")
                     except Exception as e:
                         st.error(f"Failed: {e}")
 
         st.markdown("")
-        if st.button("â Back to App", use_container_width=True):
+        if st.button("\u2190 Back to App", use_container_width=True):
             st.session_state["show_auth"] = False
             st.rerun()
 
 
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # PREMIUM GATE
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 def show_premium_gate(feature: str = "this feature"):
     st.markdown(f"""
     <div class="premium-gate">
-      <h2>ð Login Required</h2>
+      <h2>\U0001f510 Login Required</h2>
       <p>Please sign in to access {feature}.</p>
     </div>""", unsafe_allow_html=True)
-    if st.button("ð Sign In / Create Account", type="primary", use_container_width=False):
+    if st.button("\U0001f510 Sign In / Create Account", type="primary", use_container_width=False):
         st.session_state["show_auth"] = True
         st.rerun()
 
 
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # DATA FETCHING (cached)
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 @st.cache_data(ttl=300)
 def fetch_price(ticker: str, period: str = "5d") -> pd.DataFrame | None:
     try:
@@ -568,9 +568,9 @@ def fetch_worldbank(indicator: str, country: str = "LK") -> dict:
     except: return {}
 
 
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # AI BRIEFING
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 def call_claude_briefing(prompt: str) -> tuple[str, str]:
     if ANTHROPIC_API_KEY:
         try:
@@ -580,7 +580,7 @@ def call_claude_briefing(prompt: str) -> tuple[str, str]:
                                   messages=[{"role": "user", "content": prompt}])
             return m.content[0].text, "Claude (claude-sonnet-4-6)"
         except Exception as e:
-            st.warning(f"Claude unavailable ({e}) â trying OpenAJâ¨¦")
+            st.warning(f"Claude unavailable ({e}) \u2014 trying OpenAI\u2026")
     if OPENAI_API_KEY:
         try:
             from openai import OpenAI
@@ -591,7 +591,7 @@ def call_claude_briefing(prompt: str) -> tuple[str, str]:
                           {"role": "user",   "content": prompt}])
             return r.choices[0].message.content, "OpenAI (gpt-4o)"
         except Exception as e:
-            st.warning(f"OpenAI unavailable ({e}) â trying Geminiâ¦")
+            st.warning(f"OpenAI unavailable ({e}) \u2014 trying Gemini\u2026")
     if GEMINI_API_KEY:
         try:
             import google.generativeai as genai
@@ -605,14 +605,15 @@ def call_claude_briefing(prompt: str) -> tuple[str, str]:
 
 def generate_briefing(md: dict) -> tuple[str, str]:
     today    = datetime.now().strftime("%A, %d %B %Y")
-    gold_usd = md.get("gold",   {}).get("close")
+    gold_usd = md.get("gold",    {}).get("close")
     usd_lkr  = md.get("usd_lkr", {}).get("close")
     gold_lkr = (gold_usd * usd_lkr) if gold_usd and usd_lkr else None
 
     def fmt(d, prefix=""):
         if d and d.get("close"):
             c, pct = d["close"], d.get("change_pct", 0) or 0
-            return f"{prefix}{c:,.2f}  {'â°' if pct>=0 else 'â¼'}{pct:+,2f}%"
+            arrow = '\u25b2' if pct >= 0 else '\u25bc'
+            return f"{prefix}{c:,.2f}  {arrow}{pct:+.2f}%"
         return "N/A"
 
     prompt = f"""You are a senior investment analyst with deep expertise in the Colombo Stock Exchange (CSE), Sri Lankan markets, and global macro investing. Write a concise but complete daily market briefing for Sri Lankan retail investors.
@@ -620,41 +621,41 @@ def generate_briefing(md: dict) -> tuple[str, str]:
 TODAY: {today}
 
 MARKET DATA:
-â¢ Gold (USD/oz):      {fmt(md.get('gold'),    '$')}
-â¢ Gold (LKR/oz):      {(f"LKR {gold_lkr:,.0f}") if gold_lkr else 'N/A'}
-â¢ Silver (USD/oz):    {fmt(md.get('silver'),  '$')}
-â¢ Oil Brent:          {fmt(md.get('oil'),     '$')}
-â¢ S&P 500:            {fmt(md.get('sp500'))}
-â¢ VIX:                {fmt(md.get('vix'))}
-â¢ USD/LKR:            {fmt(md.get('usd_lkr'))}
-â¢ USD Index (DXY):    {fmt(md.get('dxy'))}
-â¢ BSE Sensex:         {fmt(md.get('sensex'))}
-â¢ Nifty 50:           {fmt(md.get('nifty'))}
+\u2022 Gold (USD/oz):      {fmt(md.get('gold'),    '$')}
+\u2022 Gold (LKR/oz):      {(f"LKR {gold_lkr:,.0f}") if gold_lkr else 'N/A'}
+\u2022 Silver (USD/oz):    {fmt(md.get('silver'),  '$')}
+\u2022 Oil Brent:          {fmt(md.get('oil'),     '$')}
+\u2022 S&P 500:            {fmt(md.get('sp500'))}
+\u2022 VIX:                {fmt(md.get('vix'))}
+\u2022 USD/LKR:            {fmt(md.get('usd_lkr'))}
+\u2022 USD Index (DXY):    {fmt(md.get('dxy'))}
+\u2022 BSE Sensex:         {fmt(md.get('sensex'))}
+\u2022 Nifty 50:           {fmt(md.get('nifty'))}
 
 Write a structured briefing:
-1. CSE Outlook â how today's data affects the Colombo Stock Exchange
-2. Gold & Silver in LKR â critical for Sri Lankan investors
-3. Global Macro Summary â US markets, Asia, forex
+1. CSE Outlook \u2014 how today's data affects the Colombo Stock Exchange
+2. Gold & Silver in LKR \u2014 critical for Sri Lankan investors
+3. Global Macro Summary \u2014 US markets, Asia, forex
 4. Key Risks & Opportunities
 5. Sentiment Score: BULLISH / NEUTRAL / BEARISH for CSE, Gold, USD/LKR
 
-Reference actual numbers. 2â3 sentences per section. End with:
-*Not investment advice â for information only.*"""
+Reference actual numbers. 2\u20133 sentences per section. End with:
+*Not investment advice \u2014 for information only.*"""
     return call_claude_briefing(prompt)
 
 
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # INIT + SIDEBAR
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 _init_state()
 if _sb: _handle_oauth_callback()
 
 with st.sidebar:
-    st.markdown("## ð InvestSmart")
+    st.markdown("## \U0001f4c8 InvestSmart")
     st.markdown("*CSE Intelligence Platform*")
     st.markdown("---")
 
-    # ââ User card (logged in) ââ
+    # \u2500\u2500 User card (logged in) \u2500\u2500
     if is_logged_in():
         profile = get_profile()
         user    = get_user()
@@ -662,7 +663,7 @@ with st.sidebar:
                    (user.email.split("@")[0].title() if user.email else "User"))
         avatar  = profile.get("avatar_url", "")
         tier    = profile.get("tier", "free")
-        email_s = (user.email or "")[:30] + ("â¦" if len(user.email or "") > 30 else "")
+        email_s = (user.email or "")[:30] + ("\u2026" if len(user.email or "") > 30 else "")
 
         if avatar:
             avatar_html = f'<img src="{avatar}" width="38" style="border-radius:50%;flex-shrink:0"/>'
@@ -676,58 +677,58 @@ with st.sidebar:
             f'<div class="user-email">{email_s}</div></div></div>',
             unsafe_allow_html=True)
 
-        badge = (f'<span class="badge-premium">â­ Premium</span>'
+        badge = (f'<span class="badge-premium">\u2b50 Premium</span>'
                  if tier == "premium"
-                 else f'<span class="badge-free">ð Free Plan</span>')
+                 else f'<span class="badge-free">\U0001f193 Free Plan</span>')
         st.markdown(badge, unsafe_allow_html=True)
         st.markdown("")
 
-    # ââ Navigation ââ
-    free_pages = ["ð  Dashboard", "ð¥ Gold & Silver", "ð Global Markets", "ð° News Feed"]
+    # \u2500\u2500 Navigation \u2500\u2500
+    free_pages = ["\U0001f3e0 Dashboard", "\U0001f947 Gold & Silver", "\U0001f30d Global Markets", "\U0001f4f0 News Feed"]
     if is_logged_in():
-        nav_pages = free_pages + ["ð¤ AI Briefing", "â­ Watchlist", "ð My Reports", "â¹ï¸ About"]
+        nav_pages = free_pages + ["\U0001f916 AI Briefing", "\u2b50 Watchlist", "\U0001f4cb My Reports", "\u2139\ufe0f About"]
     else:
-        nav_pages = free_pages + ["ð AI Briefing", "ð Watchlist", "â¹ï¸ About"]
+        nav_pages = free_pages + ["\U0001f512 AI Briefing", "\U0001f512 Watchlist", "\u2139\ufe0f About"]
 
     page = st.radio("Navigate", nav_pages, label_visibility="collapsed")
 
     st.markdown("---")
     st.markdown(f"**Last updated:** {datetime.now().strftime('%H:%M:%S')}")
-    if st.button("ð Refresh Data"):
+    if st.button("\U0001f504 Refresh Data"):
         st.cache_data.clear()
         st.rerun()
 
     st.markdown("---")
     if is_logged_in():
-        if st.button("ðª Sign Out", use_container_width=True):
+        if st.button("\U0001f6aa Sign Out", use_container_width=True):
             do_logout()
     else:
-        if st.button("ð Sign In / Sign Up", type="primary", use_container_width=True):
+        if st.button("\U0001f510 Sign In / Sign Up", type="primary", use_container_width=True):
             st.session_state["show_auth"] = True
             st.rerun()
 
     st.markdown("")
-    st.caption("Data: Yahoo Finance Â· FRED Â· World Bank Â· NewsAPI")
-    st.caption("AI: Claude Â· OpenAI Â· Gemini")
+    st.caption("Data: Yahoo Finance \u00b7 FRED \u00b7 World Bank \u00b7 NewsAPI")
+    st.caption("AI: Claude \u00b7 OpenAI \u00b7 Gemini")
 
-# ââ Redirect locked pages to auth ââââââââââââââââââ
-if page in ["ð AI Briefing", "ð Watchlist"]:
+# \u2500\u2500 Redirect locked pages to auth \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+if page in ["\U0001f512 AI Briefing", "\U0001f512 Watchlist"]:
     st.session_state["show_auth"] = True
 
-# ââ Show auth page if requested ââââââââââââââââââââ
+# \u2500\u2500 Show auth page if requested \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 if st.session_state.get("show_auth") and not is_logged_in():
     show_auth_page()
     st.stop()
 
 
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # PAGE: DASHBOARD
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
-if page == "ð  Dashboard":
-    st.title("ð Market Dashboard")
-    st.caption(f"Real-time overview Â· {datetime.now().strftime('%A, %d %B %Y %H:%M')}")
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+if page == "\U0001f3e0 Dashboard":
+    st.title("\U0001f4ca Market Dashboard")
+    st.caption(f"Real-time overview \u00b7 {datetime.now().strftime('%A, %d %B %Y %H:%M')}")
 
-    with st.spinner("Loading market dataâ¦"):
+    with st.spinner("Loading market data\u2026"):
         gold   = current_price("GC=F")
         silver = current_price("SI=F")
         usd_lkr= current_price("LKR=X")
@@ -740,7 +741,7 @@ if page == "ð  Dashboard":
     def metric_delta(d: dict) -> str | None:
         return f"{d['change_pct']:+.2f}%" if d.get("change_pct") is not None else None
 
-    st.markdown("### ð Key Indicators")
+    st.markdown("### \U0001f511 Key Indicators")
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         v = gold.get("close")
@@ -761,7 +762,7 @@ if page == "ð  Dashboard":
     st.markdown("---")
     col_a, col_b, col_c = st.columns(3)
     with col_a:
-        st.markdown("**ð US Markets**")
+        st.markdown("**\U0001f310 US Markets**")
         for label, d in [("S&P 500", sp500), ("Brent Oil", oil)]:
             v = d.get("close"); p = d.get("change_pct") or 0
             c = "positive" if p >= 0 else "negative"
@@ -769,14 +770,14 @@ if page == "ð  Dashboard":
             st.markdown(f"{label}: `{prefix}{v:,.2f}` <span class='{c}'>{p:+.2f}%</span>"
                         if v else f"{label}: N/A", unsafe_allow_html=True)
     with col_b:
-        st.markdown("**ð Asian Markets**")
+        st.markdown("**\U0001f30f Asian Markets**")
         for label, d in [("BSE Sensex", sensex), ("Nifty 50", nifty)]:
             v = d.get("close"); p = d.get("change_pct") or 0
             c = "positive" if p >= 0 else "negative"
             st.markdown(f"{label}: `{v:,.0f}` <span class='{c}'>{p:+.2f}%</span>"
                         if v else f"{label}: N/A", unsafe_allow_html=True)
     with col_c:
-        st.markdown("**ð° Precious Metals**")
+        st.markdown("**\U0001f4b0 Precious Metals**")
         for label, d, prefix in [("Silver", silver, "$"), ("Gold", gold, "$")]:
             v = d.get("close"); p = d.get("change_pct") or 0
             c = "positive" if p >= 0 else "negative"
@@ -784,8 +785,8 @@ if page == "ð  Dashboard":
                         if v else f"{label}: N/A", unsafe_allow_html=True)
 
     st.markdown("---")
-    st.markdown("### ð 30-Day Performance Comparison")
-    with st.spinner("Loading chartâ¦"):
+    st.markdown("### \U0001f4c9 30-Day Performance Comparison")
+    with st.spinner("Loading chart\u2026"):
         tickers_chart = {"Gold": "GC=F", "Silver": "SI=F", "S&P 500": "^GSPC",
                          "Sensex": "^BSESN", "Oil": "BZ=F"}
         fig = go.Figure()
@@ -804,19 +805,19 @@ if page == "ð  Dashboard":
         st.plotly_chart(fig, use_container_width=True)
 
 
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # PAGE: GOLD & SILVER
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
-elif page == "ð¥ Gold & Silver":
-    st.title("ð¥ Gold & Silver")
-    st.caption("Precious metals â priced in USD and Sri Lankan Rupees")
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+elif page == "\U0001f947 Gold & Silver":
+    st.title("\U0001f947 Gold & Silver")
+    st.caption("Precious metals \u2014 priced in USD and Sri Lankan Rupees")
 
-    with st.spinner("Loading pricesâ¦"):
+    with st.spinner("Loading prices\u2026"):
         gold   = current_price("GC=F")
         silver = current_price("SI=F")
         usd_lkr_data = current_price("LKR=X")
 
-    usd_lkr_rate = usd_lkr_data.get("close") or 312
+    usd_lkr_rate = usd_lkr_data.get("close") or 320
 
     gp   = gold.get("close");   gpct = gold.get("change_pct")
     sp   = silver.get("close"); spct = silver.get("change_pct")
@@ -837,13 +838,13 @@ elif page == "ð¥ Gold & Silver":
     m5.metric("Silver (LKR/oz)",  fmt_lkr(silver_lkr_val))
     m6.metric("Gold/Silver Ratio",f"{gp/sp:.1f}x"       if gp and sp else "N/A")
 
-    st.caption("Gold (LKR) = Gold (USD/oz) Ã USD/LKR rate. LKR depreciation amplifies gold returns.")
+    st.caption("Gold (LKR) = Gold (USD/oz) \u00d7 USD/LKR rate. LKR depreciation amplifies gold returns.")
 
     st.markdown("---")
     st.markdown("### 1-Month Price Chart")
     choice = st.selectbox("Choose metal", ["Gold (GC=F)", "Silver (SI=F)"])
     ticker = "GC=F" if "Gold" in choice else "SI=F"
-    with st.spinner("Loading chartâ¦"):
+    with st.spinner("Loading chart\u2026"):
         df = fetch_price(ticker, "1mo")
         if df is not None and not df.empty:
             fig = go.Figure(go.Candlestick(
@@ -859,7 +860,7 @@ elif page == "ð¥ Gold & Silver":
 
     st.markdown("---")
     st.markdown("### Sri Lanka Macro Context")
-    with st.spinner("Loading World Bank dataâ¦"):
+    with st.spinner("Loading World Bank data\u2026"):
         gdp  = fetch_worldbank("NY.GDP.MKTP.CD")
         cpi  = fetch_worldbank("FP.CPI.TOTL.ZG")
         fdi  = fetch_worldbank("BX.KLT.DINV.CD.WD")
@@ -880,14 +881,14 @@ elif page == "ð¥ Gold & Silver":
                rem.get("year",""))
 
 
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # PAGE: GLOBAL MARKETS
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
-elif page == "ð Global Markets":
-    st.title("ð Global Markets")
-    st.caption("US, Asian, and European indices â with Sri Lanka context")
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+elif page == "\U0001f30d Global Markets":
+    st.title("\U0001f30d Global Markets")
+    st.caption("US, Asian, and European indices \u2014 with Sri Lanka context")
 
-    with st.spinner("Fetching indicesâ¦"):
+    with st.spinner("Fetching indices\u2026"):
         indices = {
             "S&P 500":    current_price("^GSPC"),
             "NASDAQ":     current_price("^IXIC"),
@@ -918,7 +919,7 @@ elif page == "ð Global Markets":
     tmap = {"S&P 500": "^GSPC", "NASDAQ": "^IXIC", "Dow Jones": "^DJI",
             "VIX (Fear)": "^VIX", "BSE Sensex": "^BSESN", "Nifty 50": "^NSEI",
             "Hang Seng": "^HSI", "Nikkei 225": "^N225", "FTSE 100": "^FTSE", "DAX": "^GDAXI"}
-    with st.spinner("Loading chartâ¦"):
+    with st.spinner("Loading chart\u2026"):
         df = fetch_price(tmap.get(market_choice, "^GSPC"), "1mo")
         if df is not None and not df.empty:
             fig = go.Figure(go.Scatter(x=df.index, y=df["Close"], fill="tozeroy",
@@ -929,8 +930,8 @@ elif page == "ð Global Markets":
             st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("---")
-    st.markdown("### ð± Forex â Sri Lanka Relevant Pairs")
-    with st.spinner("Loading forexâ¦"):
+    st.markdown("### \U0001f4b1 Forex \u2014 Sri Lanka Relevant Pairs")
+    with st.spinner("Loading forex\u2026"):
         forex = {"USD/LKR": current_price("LKR=X"),  "EUR/LKR": current_price("EURLKR=X"),
                  "GBP/LKR": current_price("GBPLKR=X"), "AED/LKR": current_price("AEDLKR=X"),
                  "JPY/LKR": current_price("JPYLKR=X"), "USD/EUR":  current_price("EURUSD=X")}
@@ -940,12 +941,12 @@ elif page == "ð Global Markets":
         col.metric(pair, f"{v:,.4f}" if v else "N/A", f"{p:+.2f}%" if p is not None else None)
 
 
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # PAGE: NEWS FEED
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
-elif page == "ð° News Feed":
-    st.title("ð° News Feed")
-    st.caption("Latest financial news â categorised for Sri Lankan investors")
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+elif page == "\U0001f4f0 News Feed":
+    st.title("\U0001f4f0 News Feed")
+    st.caption("Latest financial news \u2014 categorised for Sri Lankan investors")
 
     categories = {
         "Sri Lanka":     "Sri Lanka",
@@ -955,12 +956,12 @@ elif page == "ð° News Feed":
         "Oil & Energy":  "oil price OPEC energy commodity",
         "Geopolitical":  "geopolitical risk war sanctions",
     }
-    tabs = st.tabs(["ð´ Sri Lanka", "ð¥ Gold & Silver", "ðµ US Economy",
-                    "ð Asian Markets", "â¡ Oil & Energy", "ð Geopolitical"])
+    tabs = st.tabs(["\U0001f334 Sri Lanka", "\U0001f947 Gold & Silver", "\U0001f4b5 US Economy",
+                    "\U0001f30f Asian Markets", "\u26a1 Oil & Energy", "\U0001f30d Geopolitical"])
 
     for tab, (cat_name, query) in zip(tabs, categories.items()):
         with tab:
-            with st.spinner(f"Loading {cat_name} newsâ¦"):
+            with st.spinner(f"Loading {cat_name} news\u2026"):
                 articles = fetch_news(query, n=10)
             if not articles:
                 if not NEWS_API_KEY:
@@ -980,47 +981,50 @@ elif page == "ð° News Feed":
                         st.markdown(f"**[{title}]({url})**")
                         if desc and "[Removed]" not in desc:
                             st.caption(desc[:220])
-                        st.caption(f"{source} Â· {pub_at}")
+                        st.caption(f"{source} \u00b7 {pub_at}")
                         st.markdown("---")
 
 
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # PAGE: AI BRIEFING  (Premium)
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
-elif page == "ð¤ AI Briefing":
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+elif page == "\U0001f916 AI Briefing":
     if not is_logged_in():
         show_premium_gate("AI Market Briefing")
         st.stop()
 
-    st.title("ð¤ AI Market Briefing")
+    st.title("\U0001f916 AI Market Briefing")
     st.caption("Daily market analysis powered by Claude AI (with OpenAI and Gemini fallback)")
 
     col_btn, col_info = st.columns([1, 3])
     with col_btn:
-        gen_btn = st.button("â¨ Generate Today's Briefing", type="primary",
+        gen_btn = st.button("\u2728 Generate Today's Briefing", type="primary",
                             use_container_width=True)
     with col_info:
         if st.session_state.get("briefing"):
-            st.success("Today's briefing is ready â scroll down to read it, or regenerate.")
+            st.success("Today's briefing is ready \u2014 scroll down to read it, or regenerate.")
         else:
-            st.info("Click to generate today's AI market briefing (takes ~30â60 seconds).")
+            st.info("Click to generate today's AI market briefing (takes ~30\u201360 seconds).")
 
     with st.expander("AI Provider Status"):
-        st.markdown(f"ð¢ **Claude (Primary):** {'Configured â' if ANTHROPIC_API_KEY else 'â Missing ANTHROPIC_API_KEY'}")
-        st.markdown(f"ð¡ **OpenAI (Secondary):** {'Configured â' if OPENAI_API_KEY else 'â Missing OPENAI_API_KEY'}")
-        st.markdown(f"ð  **Gemini (Fallback):** {'Configured â' if GEMINI_API_KEY else 'â Missing GEMINI_API_KEY'}")
+        claude_status = 'Configured \u2713' if ANTHROPIC_API_KEY else '\u274c Missing ANTHROPIC_API_KEY'
+        openai_status = 'Configured \u2713' if OPENAI_API_KEY else '\u274c Missing OPENAI_API_KEY'
+        gemini_status = 'Configured \u2713' if GEMINI_API_KEY else '\u274c Missing GEMINI_API_KEY'
+        st.markdown(f"\U0001f7e2 **Claude (Primary):** {claude_status}")
+        st.markdown(f"\U0001f7e1 **OpenAI (Secondary):** {openai_status}")
+        st.markdown(f"\U0001f7e0 **Gemini (Fallback):** {gemini_status}")
 
     if gen_btn:
-        with st.spinner("ð§  Fetching market data and generating briefingâ¦"):
+        with st.spinner("\U0001f9e0 Fetching market data and generating briefing\u2026"):
             md = {k: current_price(t) for k, t in {
                 "gold": "GC=F", "silver": "SI=F", "usd_lkr": "LKR=X",
                 "sp500": "^GSPC", "vix": "^VIX", "oil": "BZ=F",
                 "sensex": "^BSESN", "nifty": "^NSEI",
-                "dxy": "DX-Y.NYB", "nasdaq": "^IXIC"}.items()}
+                "dxy": "DX=F", "nasdaq": "^IXIC"}.items()}
             briefing_text, model_used = generate_briefing(md)
 
         if briefing_text and "failed" not in briefing_text.lower()[:50]:
-            st.success(f"â Generated by **{model_used}**")
+            st.success(f"\u2705 Generated by **{model_used}**")
             st.session_state["briefing"]   = briefing_text
             st.session_state["model_used"] = model_used
         else:
@@ -1044,41 +1048,41 @@ elif page == "ð¤ AI Briefing":
             text_lower = briefing_to_show.lower()
             if "bullish" in text_lower: sent = "BULLISH"
             elif "bearish" in text_lower: sent = "BEARISH"
-            if st.button("ð¾ Save to My Reports", use_container_width=True):
+            if st.button("\U0001f4be Save to My Reports", use_container_width=True):
                 if db_save_briefing(save_title, briefing_to_show, model_label, sent):
                     st.success("Saved!")
                 else:
-                    st.error("Save failed â make sure you're logged in.")
+                    st.error("Save failed \u2014 make sure you're logged in.")
 
 
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # PAGE: WATCHLIST  (Premium)
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
-elif page == "â­ Watchlist":
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+elif page == "\u2b50 Watchlist":
     if not is_logged_in():
         show_premium_gate("Watchlist")
         st.stop()
 
-    st.title("â­ My Watchlist")
-    st.caption("Track your favourite tickers â CSE stocks, global indices, commodities")
+    st.title("\u2b50 My Watchlist")
+    st.caption("Track your favourite tickers \u2014 CSE stocks, global indices, commodities")
 
-    # ââ Add ticker ââ
-    with st.expander("â Add Ticker", expanded=False):
+    # \u2500\u2500 Add ticker \u2500\u2500
+    with st.expander("\u2795 Add Ticker", expanded=False):
         ac1, ac2, ac3, ac4 = st.columns([2, 2, 1.5, 1])
         with ac1: new_t = st.text_input("Ticker symbol", placeholder="JKH.N0000 or ^GSPC")
         with ac2: new_n = st.text_input("Display name",  placeholder="John Keells")
         with ac3: cat   = st.selectbox("Category", ["stock", "index", "commodity", "forex"])
         with ac4:
             st.markdown("&nbsp;", unsafe_allow_html=True)
-            if st.button("Add â", type="primary"):
+            if st.button("Add \u2192", type="primary"):
                 if new_t and new_n:
                     if db_add_watchlist(new_t.strip().upper(), new_n.strip(), cat):
-                        st.success(f"â {new_t.upper()} added!")
+                        st.success(f"\u2705 {new_t.upper()} added!")
                         st.rerun()
                 else:
                     st.warning("Enter ticker and name.")
 
-    # ââ Display ââ
+    # \u2500\u2500 Display \u2500\u2500
     items = db_get_watchlist()
     if not items:
         st.info("Your watchlist is empty. Add tickers above to start tracking.")
@@ -1110,38 +1114,38 @@ elif page == "â­ Watchlist":
                             unsafe_allow_html=True)
                 st.caption(ticker)
             with c2:
-                st.markdown(f"**{v:,.2f}**" if v else "â")
+                st.markdown(f"**{v:,.2f}**" if v else "\u2014")
             with c3:
                 if p is not None:
-                    arrow = "â²" if p >= 0 else "â¼"
+                    arrow = "\u25b2" if p >= 0 else "\u25bc"
                     cls   = "positive" if p >= 0 else "negative"
                     st.markdown(f'<span class="{cls}">{arrow} {abs(p):.2f}%</span>',
                                 unsafe_allow_html=True)
                 else:
-                    st.markdown("â")
+                    st.markdown("\u2014")
             with c4:
                 st.caption(item.get("added_at", "")[:10])
             with c5:
-                if st.button("â", key=f"rm_{ticker}"):
+                if st.button("\u2715", key=f"rm_{ticker}"):
                     db_remove_watchlist(ticker)
                     st.rerun()
             st.markdown("---")
 
 
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # PAGE: MY REPORTS  (Premium)
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
-elif page == "ð My Reports":
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+elif page == "\U0001f4cb My Reports":
     if not is_logged_in():
         show_premium_gate("My Reports")
         st.stop()
 
-    st.title("ð My Reports")
+    st.title("\U0001f4cb My Reports")
     st.caption("Saved AI briefings and personal investment notes")
 
-    tab_b, tab_n = st.tabs(["ð¤ Saved Briefings", "ð My Notes"])
+    tab_b, tab_n = st.tabs(["\U0001f916 Saved Briefings", "\U0001f4dd My Notes"])
 
-    # ââ SAVED BRIEFINGS ââ
+    # \u2500\u2500 SAVED BRIEFINGS \u2500\u2500
     with tab_b:
         briefings = db_get_briefings()
         if not briefings:
@@ -1150,35 +1154,35 @@ elif page == "ð My Reports":
             st.markdown(f"**{len(briefings)} briefings saved**")
             for b in briefings:
                 sent  = b.get("sentiment", "")
-                sent_badge = {"BULLISH": "ð¢", "BEARISH": "ð´", "NEUTRAL": "ð¡"}.get(sent, "âª")
+                sent_badge = {"BULLISH": "\U0001f7e2", "BEARISH": "\U0001f534", "NEUTRAL": "\U0001f7e1"}.get(sent, "\u26aa")
                 title = b.get("title", "Briefing")
                 dt    = b.get("created_at", "")[:10]
-                with st.expander(f"{sent_badge} {title} â {dt}"):
+                with st.expander(f"{sent_badge} {title} \u2014 {dt}"):
                     st.markdown(b.get("content", ""))
                     c1, c2 = st.columns([4, 1])
                     with c1:
-                        st.caption(f"Model: {b.get('model_used','?')} Â· Sentiment: {sent or 'N/A'}")
+                        st.caption(f"Model: {b.get('model_used','?')} \u00b7 Sentiment: {sent or 'N/A'}")
                     with c2:
-                        if st.button("ð Delete", key=f"del_b_{b['id']}"):
+                        if st.button("\U0001f5d1 Delete", key=f"del_b_{b['id']}"):
                             db_delete_briefing(b["id"])
                             st.rerun()
 
-    # ââ MY NOTES ââ
+    # \u2500\u2500 MY NOTES \u2500\u2500
     with tab_n:
         # New note form
-        with st.expander("âï¸ Write New Note", expanded=False):
+        with st.expander("\u270f\ufe0f Write New Note", expanded=False):
             nc1, nc2 = st.columns([3, 1])
             with nc1: n_title = st.text_input("Note title", placeholder="My CSE Analysis")
-            with nc2: n_pinned = st.checkbox("ð Pin")
+            with nc2: n_pinned = st.checkbox("\U0001f4cc Pin")
             n_content = st.text_area("Content", height=140,
-                                     placeholder="Your thoughts, analysis, remindersâ¦")
+                                     placeholder="Your thoughts, analysis, reminders\u2026")
             n_tags = st.text_input("Tags (comma separated)",
                                    placeholder="CSE, gold, weekly-review")
-            if st.button("ð¾ Save Note", type="primary"):
+            if st.button("\U0001f4be Save Note", type="primary"):
                 if n_title and n_content:
                     tags = [t.strip() for t in n_tags.split(",") if t.strip()]
                     db_save_note(n_title, n_content, tags, n_pinned)
-                    st.success("â Note saved!")
+                    st.success("\u2705 Note saved!")
                     st.rerun()
                 else:
                     st.warning("Enter a title and content.")
@@ -1190,12 +1194,12 @@ elif page == "ð My Reports":
         else:
             st.markdown(f"**{len(notes)} notes**")
             for n in notes:
-                pin_icon = "ð " if n.get("is_pinned") else ""
+                pin_icon = "\U0001f4cc " if n.get("is_pinned") else ""
                 tags_html = " ".join(
                     f'<span style="background:#1e2440;color:#7b8cde;'
                     f'padding:1px 8px;border-radius:4px;font-size:0.72rem">{t}</span>'
                     for t in (n.get("tags") or []))
-                label = f"{pin_icon}{n.get('title','Note')} â {n.get('updated_at','')[:10]}"
+                label = f"{pin_icon}{n.get('title','Note')} \u2014 {n.get('updated_at','')[:10]}"
                 with st.expander(label):
                     if tags_html:
                         st.markdown(tags_html, unsafe_allow_html=True)
@@ -1206,33 +1210,33 @@ elif page == "ð My Reports":
                     with ec1:
                         st.caption(f"Updated {n.get('updated_at','')[:16]}")
                     with ec2:
-                        if st.button("ð¾ Save", key=f"sv_{n['id']}"):
+                        if st.button("\U0001f4be Save", key=f"sv_{n['id']}"):
                             db_update_note(n["id"], content=edited)
                             st.success("Saved!")
                             st.rerun()
                     with ec3:
-                        if st.button("ð Del", key=f"dn_{n['id']}"):
+                        if st.button("\U0001f5d1 Del", key=f"dn_{n['id']}"):
                             db_delete_note(n["id"])
                             st.rerun()
 
 
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # PAGE: ABOUT
-# âââââââââââââââââââââââââââââââââââââââââââââââââ
-elif page == "â¹ï¸ About":
-    st.title("â¹ï¸ About InvestSmart")
+# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+elif page == "\u2139\ufe0f About":
+    st.title("\u2139\ufe0f About InvestSmart")
     st.markdown("""
 ## What is InvestSmart?
 
 InvestSmart is an AI-powered investment intelligence platform built specifically for Sri Lankan investors.
-It monitors global market factors that affect the Colombo Stock Exchange (CSE), gold, silver, and bonds â
+It monitors global market factors that affect the Colombo Stock Exchange (CSE), gold, silver, and bonds \u2014
 and generates daily AI briefings to help you make better-informed investment decisions.
 
 ## Data Sources
 
 | Source | What We Use It For |
 |--------|--------------------|
-| Yahoo Finance | 40+ tickers â gold, silver, CSE indices, forex, global markets |
+| Yahoo Finance | 40+ tickers \u2014 gold, silver, CSE indices, forex, global markets |
 | FRED (Federal Reserve) | US macro data: interest rates, inflation, yield curve |
 | World Bank Open API | Sri Lanka macro: GDP, CPI, FDI, remittances |
 | NewsAPI | 6 categories of financial news |
@@ -1241,7 +1245,7 @@ and generates daily AI briefings to help you make better-informed investment dec
 
 | Priority | Model | Purpose |
 |----------|-------|---------|
-| 1st | Claude claude-sonnet-4-6 (Anthropic) | Daily briefings, sector analysis |
+| 1st | claude-sonnet-4-6 (Anthropic) | Daily briefings, sector analysis |
 | 2nd | GPT-4o (OpenAI) | Fallback for briefings |
 | 3rd | Gemini 1.5 Flash (Google) | Free fallback |
 
@@ -1250,19 +1254,19 @@ and generates daily AI briefings to help you make better-informed investment dec
 - **Frontend:** Streamlit (Python)
 - **Hosting:** Streamlit Community Cloud
 - **Database & Auth:** Supabase (PostgreSQL + Auth)
-- **Auth Methods:** Email/Password Â· Google OAuth Â· Phone SMS OTP
+- **Auth Methods:** Email/Password \u00b7 Google OAuth \u00b7 Phone SMS OTP
 
 ## Account Features (Free vs Premium)
 
 | Feature | Free | Logged In |
 |---------|------|-----------|
-| Dashboard | â | â |
-| Gold & Silver | â | â |
-| Global Markets | â | â |
-| News Feed | â | â |
-| AI Briefing | â | â |
-| Watchlist | â | â |
-| My Reports & Notes | â | â |
+| Dashboard | \u2705 | \u2705 |
+| Gold & Silver | \u2705 | \u2705 |
+| Global Markets | \u2705 | \u2705 |
+| News Feed | \u2705 | \u2705 |
+| AI Briefing | \u2014 | \u2705 |
+| Watchlist | \u2014 | \u2705 |
+| My Reports & Notes | \u2014 | \u2705 |
 
 ## Disclaimer
 
@@ -1270,5 +1274,5 @@ InvestSmart is for **informational purposes only**. Nothing on this platform con
 investment advice. Always do your own research and consult a licensed financial advisor
 before making investment decisions.
 
-*Built for Sri Lankan investors Â· v2.0 â with Authentication*
+*Built for Sri Lankan investors \u00b7 v2.0 \u2014 with Authentication*
 """)
