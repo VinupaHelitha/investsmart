@@ -1,11 +1,11 @@
 """
-app.py — InvestSmart v2.0
+app.py â InvestSmart v2.0
 Streamlit dashboard + full authentication for CSE & global market intelligence.
 
-Pages (Free):    Dashboard · Gold & Silver · Global Markets · News Feed · About
-Pages (Premium): AI Briefing · Watchlist · My Reports  (require login)
+Pages (Free):    Dashboard Â· Gold & Silver Â· Global Markets Â· News Feed Â· About
+Pages (Premium): AI Briefing Â· Watchlist Â· My Reports  (require login)
 
-Auth:  Supabase — Email/Password · Google OAuth · Phone SMS OTP
+Auth:  Supabase â Email/Password Â· Google OAuth Â· Phone SMS OTP
 """
 
 import os
@@ -26,9 +26,9 @@ except ImportError:
 
 load_dotenv()
 
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 # SECRETS
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 def get_secret(key: str, default: str = "") -> str:
     try:
         return st.secrets.get(key, os.getenv(key, default))
@@ -44,12 +44,12 @@ SUPABASE_URL      = get_secret("SUPABASE_URL")
 SUPABASE_KEY      = get_secret("SUPABASE_KEY")
 APP_URL           = "https://investsmart-uznzrnzf4rdkmthkmtuofc.streamlit.app"
 
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 # PAGE CONFIG
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 st.set_page_config(
-    page_title="InvestSmart — CSE Intelligence",
-    page_icon="📈",
+    page_title="InvestSmart â CSE Intelligence",
+    page_icon="ð",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -66,7 +66,7 @@ st.markdown("""
   div[data-testid="stMetric"] { background:#1e2130; border-radius:10px; padding:12px; }
   div[data-testid="stMetric"] label { font-size:0.78rem !important; }
 
-  /* ── Auth ── */
+  /* ââ Auth ââ */
   .auth-logo { text-align:center; padding:24px 0 8px 0; }
   .auth-logo .icon { font-size:3rem; }
   .auth-logo .brand { font-size:1.7rem; font-weight:800; color:#e0e4ff; margin-top:4px; }
@@ -105,9 +105,9 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 # FORMATTERS
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 def fmt_lkr(value: float | None) -> str:
     if value is None: return "N/A"
     if value >= 1_000_000: return f"LKR {value/1_000_000:.2f}M"
@@ -120,9 +120,9 @@ def fmt_index(value: float | None) -> str:
     if value >= 1_000:   return f"{value:,.0f}"
     return f"{value:,.2f}"
 
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 # SUPABASE CLIENT
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 @st.cache_resource
 def _get_sb():
     if not _SUPABASE_OK or not SUPABASE_URL or not SUPABASE_KEY:
@@ -131,7 +131,7 @@ def _get_sb():
 
 _sb = _get_sb()
 
-# ── Auth state helpers ─────────────────────────────
+# ââ Auth state helpers âââââââââââââââââââââââââââââ
 def _init_state():
     defaults = {
         "auth_user": None, "auth_session": None, "auth_profile": None,
@@ -185,7 +185,7 @@ def do_logout():
     st.session_state["show_auth"] = False
     st.rerun()
 
-# ── DB helpers ────────────────────────────────────
+# ââ DB helpers ââââââââââââââââââââââââââââââââââââ
 def db_get_watchlist():
     user = get_user()
     if not user or not _sb: return []
@@ -274,9 +274,9 @@ def db_delete_note(nid: int):
         _sb.table("user_notes").delete().eq("id", nid).eq("user_id", user.id).execute()
     except: pass
 
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 # AUTH PAGE UI
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 _G_ICON = """<svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
 <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0
  14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
@@ -301,16 +301,16 @@ def _google_btn(label: str):
             <div class="google-btn">{_G_ICON}&nbsp; {label}</div>
           </a></div>""", unsafe_allow_html=True)
     except:
-        st.caption("Google sign-in not yet configured — use email or phone below.")
+        st.caption("Google sign-in not yet configured â use email or phone below.")
 
 def show_auth_page():
-    """Full-screen auth page: Sign In · Create Account · Phone · Reset."""
+    """Full-screen auth page: Sign In Â· Create Account Â· Phone Â· Reset."""
     _, col, _ = st.columns([1, 1.5, 1])
     with col:
         # Logo
         st.markdown("""
         <div class="auth-logo">
-          <div class="icon">📈</div>
+          <div class="icon">ð</div>
           <div class="brand">InvestSmart</div>
           <div class="tagline">CSE Intelligence Platform</div>
         </div>""", unsafe_allow_html=True)
@@ -322,10 +322,10 @@ def show_auth_page():
             st.success(st.session_state.pop("auth_success"))
 
         tab_si, tab_su, tab_ph, tab_pw = st.tabs(
-            ["🔐 Sign In", "✨ Create Account", "📱 Phone OTP", "🔑 Reset Password"]
+            ["ð Sign In", "â¨ Create Account", "ð± Phone OTP", "ð Reset Password"]
         )
 
-        # ── SIGN IN ──────────────────────────────────
+        # ââ SIGN IN ââââââââââââââââââââââââââââââââââ
         with tab_si:
             _google_btn("Continue with Google")
             st.markdown('<div class="or-divider">or sign in with email</div>',
@@ -336,7 +336,7 @@ def show_auth_page():
                                          key="si_email")
                 password = st.text_input("Password", type="password",
                                          placeholder="Your password", key="si_pw")
-                ok = st.form_submit_button("Sign In →", use_container_width=True,
+                ok = st.form_submit_button("Sign In â", use_container_width=True,
                                            type="primary")
             if ok:
                 if not email or not password:
@@ -353,13 +353,13 @@ def show_auth_page():
                     except Exception as e:
                         err = str(e).lower()
                         if "invalid" in err:
-                            st.error("❌ Invalid email or password.")
+                            st.error("â Invalid email or password.")
                         elif "not confirmed" in err:
-                            st.warning("📧 Please verify your email before signing in.")
+                            st.warning("ð§ Please verify your email before signing in.")
                         else:
                             st.error(f"Sign-in failed: {e}")
 
-        # ── CREATE ACCOUNT ────────────────────────────
+        # ââ CREATE ACCOUNT ââââââââââââââââââââââââââââ
         with tab_su:
             _google_btn("Sign up with Google")
             st.markdown('<div class="or-divider">or create with email</div>',
@@ -374,7 +374,7 @@ def show_auth_page():
                                         placeholder="Repeat password")
                 agreed  = st.checkbox(
                     "I agree to the Terms of Service and Privacy Policy")
-                sub = st.form_submit_button("Create Account →",
+                sub = st.form_submit_button("Create Account â",
                                             use_container_width=True, type="primary")
             if sub:
                 if not name or not s_email or not s_pw:
@@ -399,22 +399,22 @@ def show_auth_page():
                             st.rerun()
                         elif r.user:
                             st.success(
-                                "✅ Account created! Check your email to verify, then sign in.")
+                                "â Account created! Check your email to verify, then sign in.")
                         else:
                             st.error("Sign-up failed. Email may already be registered.")
                     except Exception as e:
                         st.error(f"Sign-up failed: {e}")
 
-        # ── PHONE OTP ────────────────────────────────
+        # ââ PHONE OTP ââââââââââââââââââââââââââââââââ
         with tab_ph:
-            st.caption("Enter your mobile number — we'll send a 6-digit SMS code.")
-            st.info("Include country code · e.g. **+94 77 123 4567** for Sri Lanka")
+            st.caption("Enter your mobile number â we'll send a 6-digit SMS code.")
+            st.info("Include country code Â· e.g. **+94 77 123 4567** for Sri Lanka")
 
             if st.session_state.get("phone_step", 1) == 1:
                 with st.form("f_phone"):
                     ph = st.text_input("Mobile number", placeholder="+94771234567",
                                        value=st.session_state.get("phone_number", ""))
-                    send = st.form_submit_button("Send SMS Code →",
+                    send = st.form_submit_button("Send SMS Code â",
                                                  use_container_width=True, type="primary")
                 if send:
                     ph = ph.strip()
@@ -434,7 +434,7 @@ def show_auth_page():
                 with st.form("f_otp"):
                     otp = st.text_input("6-digit code", placeholder="123456",
                                         max_chars=6)
-                    verify = st.form_submit_button("Verify & Sign In →",
+                    verify = st.form_submit_button("Verify & Sign In â",
                                                    use_container_width=True,
                                                    type="primary")
                 if verify:
@@ -452,16 +452,16 @@ def show_auth_page():
                                 st.error("Invalid or expired code.")
                         except Exception as e:
                             st.error(f"Verification failed: {e}")
-                if st.button("← Change number"):
+                if st.button("â Change number"):
                     st.session_state["phone_step"] = 1
                     st.rerun()
 
-        # ── RESET PASSWORD ───────────────────────────
+        # ââ RESET PASSWORD âââââââââââââââââââââââââââ
         with tab_pw:
             st.caption("We'll email you a link to reset your password.")
             with st.form("f_reset"):
                 r_email = st.text_input("Registered email", placeholder="you@example.com")
-                send_r  = st.form_submit_button("Send Reset Link →",
+                send_r  = st.form_submit_button("Send Reset Link â",
                                                 use_container_width=True, type="primary")
             if send_r:
                 if not r_email:
@@ -470,33 +470,33 @@ def show_auth_page():
                     try:
                         _sb.auth.reset_password_email(
                             r_email, options={"redirect_to": APP_URL})
-                        st.success("✅ Reset link sent! Check your inbox.")
+                        st.success("â Reset link sent! Check your inbox.")
                     except Exception as e:
                         st.error(f"Failed: {e}")
 
         st.markdown("")
-        if st.button("← Back to App", use_container_width=True):
+        if st.button("â Back to App", use_container_width=True):
             st.session_state["show_auth"] = False
             st.rerun()
 
 
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 # PREMIUM GATE
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 def show_premium_gate(feature: str = "this feature"):
     st.markdown(f"""
     <div class="premium-gate">
-      <h2>🔐 Login Required</h2>
+      <h2>ð Login Required</h2>
       <p>Please sign in to access {feature}.</p>
     </div>""", unsafe_allow_html=True)
-    if st.button("🔐 Sign In / Create Account", type="primary", use_container_width=False):
+    if st.button("ð Sign In / Create Account", type="primary", use_container_width=False):
         st.session_state["show_auth"] = True
         st.rerun()
 
 
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 # DATA FETCHING (cached)
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 @st.cache_data(ttl=300)
 def fetch_price(ticker: str, period: str = "5d") -> pd.DataFrame | None:
     try:
@@ -568,9 +568,9 @@ def fetch_worldbank(indicator: str, country: str = "LK") -> dict:
     except: return {}
 
 
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 # AI BRIEFING
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 def call_claude_briefing(prompt: str) -> tuple[str, str]:
     if ANTHROPIC_API_KEY:
         try:
@@ -580,7 +580,7 @@ def call_claude_briefing(prompt: str) -> tuple[str, str]:
                                   messages=[{"role": "user", "content": prompt}])
             return m.content[0].text, "Claude (claude-sonnet-4-6)"
         except Exception as e:
-            st.warning(f"Claude unavailable ({e}) — trying OpenAJ⨦")
+            st.warning(f"Claude unavailable ({e}) â trying OpenAJâ¨¦")
     if OPENAI_API_KEY:
         try:
             from openai import OpenAI
@@ -591,7 +591,7 @@ def call_claude_briefing(prompt: str) -> tuple[str, str]:
                           {"role": "user",   "content": prompt}])
             return r.choices[0].message.content, "OpenAI (gpt-4o)"
         except Exception as e:
-            st.warning(f"OpenAI unavailable ({e}) — trying Gemini…")
+            st.warning(f"OpenAI unavailable ({e}) â trying Geminiâ¦")
     if GEMINI_API_KEY:
         try:
             import google.generativeai as genai
@@ -612,7 +612,7 @@ def generate_briefing(md: dict) -> tuple[str, str]:
     def fmt(d, prefix=""):
         if d and d.get("close"):
             c, pct = d["close"], d.get("change_pct", 0) or 0
-            return f"{prefix}{c:,.2f}  {'▰' if pct>=0 else '▼'}{pct:+,2f}%"
+            return f"{prefix}{c:,.2f}  {'â°' if pct>=0 else 'â¼'}{pct:+,2f}%"
         return "N/A"
 
     prompt = f"""You are a senior investment analyst with deep expertise in the Colombo Stock Exchange (CSE), Sri Lankan markets, and global macro investing. Write a concise but complete daily market briefing for Sri Lankan retail investors.
@@ -620,41 +620,41 @@ def generate_briefing(md: dict) -> tuple[str, str]:
 TODAY: {today}
 
 MARKET DATA:
-• Gold (USD/oz):      {fmt(md.get('gold'),    '$')}
-• Gold (LKR/oz):      {f"LKR {:,.0f}".format(gold_lkr) if gold_lkr else 'N/A'}
-• Silver (USD/oz):    {fmt(md.get('silver'),  '$')}
-• Oil Brent:          {fmt(md.get('oil'),     '$')}
-• S&P 500:            {fmt(md.get('sp500'))}
-• VIX:                {fmt(md.get('vix'))}
-• USD/LKR:            {fmt(md.get('usd_lkr'))}
-• USD Index (DXY):    {fmt(md.get('dxy'))}
-• BSE Sensex:         {fmt(md.get('sensex'))}
-• Nifty 50:           {fmt(md.get('nifty'))}
+â¢ Gold (USD/oz):      {fmt(md.get('gold'),    '$')}
+â¢ Gold (LKR/oz):      {(f"LKR {gold_lkr:,.0f}") if gold_lkr else 'N/A'}
+â¢ Silver (USD/oz):    {fmt(md.get('silver'),  '$')}
+â¢ Oil Brent:          {fmt(md.get('oil'),     '$')}
+â¢ S&P 500:            {fmt(md.get('sp500'))}
+â¢ VIX:                {fmt(md.get('vix'))}
+â¢ USD/LKR:            {fmt(md.get('usd_lkr'))}
+â¢ USD Index (DXY):    {fmt(md.get('dxy'))}
+â¢ BSE Sensex:         {fmt(md.get('sensex'))}
+â¢ Nifty 50:           {fmt(md.get('nifty'))}
 
 Write a structured briefing:
-1. CSE Outlook — how today's data affects the Colombo Stock Exchange
-2. Gold & Silver in LKR — critical for Sri Lankan investors
-3. Global Macro Summary — US markets, Asia, forex
+1. CSE Outlook â how today's data affects the Colombo Stock Exchange
+2. Gold & Silver in LKR â critical for Sri Lankan investors
+3. Global Macro Summary â US markets, Asia, forex
 4. Key Risks & Opportunities
 5. Sentiment Score: BULLISH / NEUTRAL / BEARISH for CSE, Gold, USD/LKR
 
-Reference actual numbers. 2–3 sentences per section. End with:
-*Not investment advice — for information only.*"""
+Reference actual numbers. 2â3 sentences per section. End with:
+*Not investment advice â for information only.*"""
     return call_claude_briefing(prompt)
 
 
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 # INIT + SIDEBAR
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 _init_state()
 if _sb: _handle_oauth_callback()
 
 with st.sidebar:
-    st.markdown("## 📈 InvestSmart")
+    st.markdown("## ð InvestSmart")
     st.markdown("*CSE Intelligence Platform*")
     st.markdown("---")
 
-    # ── User card (logged in) ──
+    # ââ User card (logged in) ââ
     if is_logged_in():
         profile = get_profile()
         user    = get_user()
@@ -662,7 +662,7 @@ with st.sidebar:
                    (user.email.split("@")[0].title() if user.email else "User"))
         avatar  = profile.get("avatar_url", "")
         tier    = profile.get("tier", "free")
-        email_s = (user.email or "")[:30] + ("…" if len(user.email or "") > 30 else "")
+        email_s = (user.email or "")[:30] + ("â¦" if len(user.email or "") > 30 else "")
 
         if avatar:
             avatar_html = f'<img src="{avatar}" width="38" style="border-radius:50%;flex-shrink:0"/>'
@@ -676,58 +676,58 @@ with st.sidebar:
             f'<div class="user-email">{email_s}</div></div></div>',
             unsafe_allow_html=True)
 
-        badge = (f'<span class="badge-premium">⭐ Premium</span>'
+        badge = (f'<span class="badge-premium">â­ Premium</span>'
                  if tier == "premium"
-                 else f'<span class="badge-free">🆓 Free Plan</span>')
+                 else f'<span class="badge-free">ð Free Plan</span>')
         st.markdown(badge, unsafe_allow_html=True)
         st.markdown("")
 
-    # ── Navigation ──
-    free_pages = ["🏠 Dashboard", "🥇 Gold & Silver", "🌍 Global Markets", "📰 News Feed"]
+    # ââ Navigation ââ
+    free_pages = ["ð  Dashboard", "ð¥ Gold & Silver", "ð Global Markets", "ð° News Feed"]
     if is_logged_in():
-        nav_pages = free_pages + ["🤖 AI Briefing", "⭐ Watchlist", "📋 My Reports", "ℹ️ About"]
+        nav_pages = free_pages + ["ð¤ AI Briefing", "â­ Watchlist", "ð My Reports", "â¹ï¸ About"]
     else:
-        nav_pages = free_pages + ["🔒 AI Briefing", "🔒 Watchlist", "ℹ️ About"]
+        nav_pages = free_pages + ["ð AI Briefing", "ð Watchlist", "â¹ï¸ About"]
 
     page = st.radio("Navigate", nav_pages, label_visibility="collapsed")
 
     st.markdown("---")
     st.markdown(f"**Last updated:** {datetime.now().strftime('%H:%M:%S')}")
-    if st.button("🔄 Refresh Data"):
+    if st.button("ð Refresh Data"):
         st.cache_data.clear()
         st.rerun()
 
     st.markdown("---")
     if is_logged_in():
-        if st.button("🚪 Sign Out", use_container_width=True):
+        if st.button("ðª Sign Out", use_container_width=True):
             do_logout()
     else:
-        if st.button("🔐 Sign In / Sign Up", type="primary", use_container_width=True):
+        if st.button("ð Sign In / Sign Up", type="primary", use_container_width=True):
             st.session_state["show_auth"] = True
             st.rerun()
 
     st.markdown("")
-    st.caption("Data: Yahoo Finance · FRED · World Bank · NewsAPI")
-    st.caption("AI: Claude · OpenAI · Gemini")
+    st.caption("Data: Yahoo Finance Â· FRED Â· World Bank Â· NewsAPI")
+    st.caption("AI: Claude Â· OpenAI Â· Gemini")
 
-# ── Redirect locked pages to auth ──────────────────
-if page in ["🔒 AI Briefing", "🔒 Watchlist"]:
+# ââ Redirect locked pages to auth ââââââââââââââââââ
+if page in ["ð AI Briefing", "ð Watchlist"]:
     st.session_state["show_auth"] = True
 
-# ── Show auth page if requested ────────────────────
+# ââ Show auth page if requested ââââââââââââââââââââ
 if st.session_state.get("show_auth") and not is_logged_in():
     show_auth_page()
     st.stop()
 
 
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 # PAGE: DASHBOARD
-# ─────────────────────────────────────────────────
-if page == "🏠 Dashboard":
-    st.title("📊 Market Dashboard")
-    st.caption(f"Real-time overview · {datetime.now().strftime('%A, %d %B %Y %H:%M')}")
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
+if page == "ð  Dashboard":
+    st.title("ð Market Dashboard")
+    st.caption(f"Real-time overview Â· {datetime.now().strftime('%A, %d %B %Y %H:%M')}")
 
-    with st.spinner("Loading market data…"):
+    with st.spinner("Loading market dataâ¦"):
         gold   = current_price("GC=F")
         silver = current_price("SI=F")
         usd_lkr= current_price("LKR=X")
@@ -740,7 +740,7 @@ if page == "🏠 Dashboard":
     def metric_delta(d: dict) -> str | None:
         return f"{d['change_pct']:+.2f}%" if d.get("change_pct") is not None else None
 
-    st.markdown("### 🔑 Key Indicators")
+    st.markdown("### ð Key Indicators")
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         v = gold.get("close")
@@ -761,7 +761,7 @@ if page == "🏠 Dashboard":
     st.markdown("---")
     col_a, col_b, col_c = st.columns(3)
     with col_a:
-        st.markdown("**🌐 US Markets**")
+        st.markdown("**ð US Markets**")
         for label, d in [("S&P 500", sp500), ("Brent Oil", oil)]:
             v = d.get("close"); p = d.get("change_pct") or 0
             c = "positive" if p >= 0 else "negative"
@@ -769,14 +769,14 @@ if page == "🏠 Dashboard":
             st.markdown(f"{label}: `{prefix}{v:,.2f}` <span class='{c}'>{p:+.2f}%</span>"
                         if v else f"{label}: N/A", unsafe_allow_html=True)
     with col_b:
-        st.markdown("**🌏 Asian Markets**")
+        st.markdown("**ð Asian Markets**")
         for label, d in [("BSE Sensex", sensex), ("Nifty 50", nifty)]:
             v = d.get("close"); p = d.get("change_pct") or 0
             c = "positive" if p >= 0 else "negative"
             st.markdown(f"{label}: `{v:,.0f}` <span class='{c}'>{p:+.2f}%</span>"
                         if v else f"{label}: N/A", unsafe_allow_html=True)
     with col_c:
-        st.markdown("**💰 Precious Metals**")
+        st.markdown("**ð° Precious Metals**")
         for label, d, prefix in [("Silver", silver, "$"), ("Gold", gold, "$")]:
             v = d.get("close"); p = d.get("change_pct") or 0
             c = "positive" if p >= 0 else "negative"
@@ -784,8 +784,8 @@ if page == "🏠 Dashboard":
                         if v else f"{label}: N/A", unsafe_allow_html=True)
 
     st.markdown("---")
-    st.markdown("### 📉 30-Day Performance Comparison")
-    with st.spinner("Loading chart…"):
+    st.markdown("### ð 30-Day Performance Comparison")
+    with st.spinner("Loading chartâ¦"):
         tickers_chart = {"Gold": "GC=F", "Silver": "SI=F", "S&P 500": "^GSPC",
                          "Sensex": "^BSESN", "Oil": "BZ=F"}
         fig = go.Figure()
@@ -804,14 +804,14 @@ if page == "🏠 Dashboard":
         st.plotly_chart(fig, use_container_width=True)
 
 
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 # PAGE: GOLD & SILVER
-# ─────────────────────────────────────────────────
-elif page == "🥇 Gold & Silver":
-    st.title("🥇 Gold & Silver")
-    st.caption("Precious metals — priced in USD and Sri Lankan Rupees")
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
+elif page == "ð¥ Gold & Silver":
+    st.title("ð¥ Gold & Silver")
+    st.caption("Precious metals â priced in USD and Sri Lankan Rupees")
 
-    with st.spinner("Loading prices…"):
+    with st.spinner("Loading pricesâ¦"):
         gold   = current_price("GC=F")
         silver = current_price("SI=F")
         usd_lkr_data = current_price("LKR=X")
@@ -837,13 +837,13 @@ elif page == "🥇 Gold & Silver":
     m5.metric("Silver (LKR/oz)",  fmt_lkr(silver_lkr_val))
     m6.metric("Gold/Silver Ratio",f"{gp/sp:.1f}x"       if gp and sp else "N/A")
 
-    st.caption("Gold (LKR) = Gold (USD/oz) × USD/LKR rate. LKR depreciation amplifies gold returns.")
+    st.caption("Gold (LKR) = Gold (USD/oz) Ã USD/LKR rate. LKR depreciation amplifies gold returns.")
 
     st.markdown("---")
     st.markdown("### 1-Month Price Chart")
     choice = st.selectbox("Choose metal", ["Gold (GC=F)", "Silver (SI=F)"])
     ticker = "GC=F" if "Gold" in choice else "SI=F"
-    with st.spinner("Loading chart…"):
+    with st.spinner("Loading chartâ¦"):
         df = fetch_price(ticker, "1mo")
         if df is not None and not df.empty:
             fig = go.Figure(go.Candlestick(
@@ -859,7 +859,7 @@ elif page == "🥇 Gold & Silver":
 
     st.markdown("---")
     st.markdown("### Sri Lanka Macro Context")
-    with st.spinner("Loading World Bank data…"):
+    with st.spinner("Loading World Bank dataâ¦"):
         gdp  = fetch_worldbank("NY.GDP.MKTP.CD")
         cpi  = fetch_worldbank("FP.CPI.TOTL.ZG")
         fdi  = fetch_worldbank("BX.KLT.DINV.CD.WD")
@@ -880,14 +880,14 @@ elif page == "🥇 Gold & Silver":
                rem.get("year",""))
 
 
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 # PAGE: GLOBAL MARKETS
-# ─────────────────────────────────────────────────
-elif page == "🌍 Global Markets":
-    st.title("🌍 Global Markets")
-    st.caption("US, Asian, and European indices — with Sri Lanka context")
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
+elif page == "ð Global Markets":
+    st.title("ð Global Markets")
+    st.caption("US, Asian, and European indices â with Sri Lanka context")
 
-    with st.spinner("Fetching indices…"):
+    with st.spinner("Fetching indicesâ¦"):
         indices = {
             "S&P 500":    current_price("^GSPC"),
             "NASDAQ":     current_price("^IXIC"),
@@ -918,7 +918,7 @@ elif page == "🌍 Global Markets":
     tmap = {"S&P 500": "^GSPC", "NASDAQ": "^IXIC", "Dow Jones": "^DJI",
             "VIX (Fear)": "^VIX", "BSE Sensex": "^BSESN", "Nifty 50": "^NSEI",
             "Hang Seng": "^HSI", "Nikkei 225": "^N225", "FTSE 100": "^FTSE", "DAX": "^GDAXI"}
-    with st.spinner("Loading chart…"):
+    with st.spinner("Loading chartâ¦"):
         df = fetch_price(tmap.get(market_choice, "^GSPC"), "1mo")
         if df is not None and not df.empty:
             fig = go.Figure(go.Scatter(x=df.index, y=df["Close"], fill="tozeroy",
@@ -929,8 +929,8 @@ elif page == "🌍 Global Markets":
             st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("---")
-    st.markdown("### 💱 Forex — Sri Lanka Relevant Pairs")
-    with st.spinner("Loading forex…"):
+    st.markdown("### ð± Forex â Sri Lanka Relevant Pairs")
+    with st.spinner("Loading forexâ¦"):
         forex = {"USD/LKR": current_price("LKR=X"),  "EUR/LKR": current_price("EURLKR=X"),
                  "GBP/LKR": current_price("GBPLKR=X"), "AED/LKR": current_price("AEDLKR=X"),
                  "JPY/LKR": current_price("JPYLKR=X"), "USD/EUR":  current_price("EURUSD=X")}
@@ -940,12 +940,12 @@ elif page == "🌍 Global Markets":
         col.metric(pair, f"{v:,.4f}" if v else "N/A", f"{p:+.2f}%" if p is not None else None)
 
 
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 # PAGE: NEWS FEED
-# ─────────────────────────────────────────────────
-elif page == "📰 News Feed":
-    st.title("📰 News Feed")
-    st.caption("Latest financial news — categorised for Sri Lankan investors")
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
+elif page == "ð° News Feed":
+    st.title("ð° News Feed")
+    st.caption("Latest financial news â categorised for Sri Lankan investors")
 
     categories = {
         "Sri Lanka":     "Sri Lanka",
@@ -955,12 +955,12 @@ elif page == "📰 News Feed":
         "Oil & Energy":  "oil price OPEC energy commodity",
         "Geopolitical":  "geopolitical risk war sanctions",
     }
-    tabs = st.tabs(["🌴 Sri Lanka", "🥇 Gold & Silver", "💵 US Economy",
-                    "🌏 Asian Markets", "⚡ Oil & Energy", "🌍 Geopolitical"])
+    tabs = st.tabs(["ð´ Sri Lanka", "ð¥ Gold & Silver", "ðµ US Economy",
+                    "ð Asian Markets", "â¡ Oil & Energy", "ð Geopolitical"])
 
     for tab, (cat_name, query) in zip(tabs, categories.items()):
         with tab:
-            with st.spinner(f"Loading {cat_name} news…"):
+            with st.spinner(f"Loading {cat_name} newsâ¦"):
                 articles = fetch_news(query, n=10)
             if not articles:
                 if not NEWS_API_KEY:
@@ -980,38 +980,38 @@ elif page == "📰 News Feed":
                         st.markdown(f"**[{title}]({url})**")
                         if desc and "[Removed]" not in desc:
                             st.caption(desc[:220])
-                        st.caption(f"{source} · {pub_at}")
+                        st.caption(f"{source} Â· {pub_at}")
                         st.markdown("---")
 
 
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 # PAGE: AI BRIEFING  (Premium)
-# ─────────────────────────────────────────────────
-elif page == "🤖 AI Briefing":
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
+elif page == "ð¤ AI Briefing":
     if not is_logged_in():
         show_premium_gate("AI Market Briefing")
         st.stop()
 
-    st.title("🤖 AI Market Briefing")
+    st.title("ð¤ AI Market Briefing")
     st.caption("Daily market analysis powered by Claude AI (with OpenAI and Gemini fallback)")
 
     col_btn, col_info = st.columns([1, 3])
     with col_btn:
-        gen_btn = st.button("✨ Generate Today's Briefing", type="primary",
+        gen_btn = st.button("â¨ Generate Today's Briefing", type="primary",
                             use_container_width=True)
     with col_info:
         if st.session_state.get("briefing"):
-            st.success("Today's briefing is ready — scroll down to read it, or regenerate.")
+            st.success("Today's briefing is ready â scroll down to read it, or regenerate.")
         else:
-            st.info("Click to generate today's AI market briefing (takes ~30–60 seconds).")
+            st.info("Click to generate today's AI market briefing (takes ~30â60 seconds).")
 
     with st.expander("AI Provider Status"):
-        st.markdown(f"🟢 **Claude (Primary):** {'Configured ✓' if ANTHROPIC_API_KEY else '❌ Missing ANTHROPIC_API_KEY'}")
-        st.markdown(f"🟡 **OpenAI (Secondary):** {'Configured ✓' if OPENAI_API_KEY else '❌ Missing OPENAI_API_KEY'}")
-        st.markdown(f"🟠 **Gemini (Fallback):** {'Configured ✓' if GEMINI_API_KEY else '❌ Missing GEMINI_API_KEY'}")
+        st.markdown(f"ð¢ **Claude (Primary):** {'Configured â' if ANTHROPIC_API_KEY else 'â Missing ANTHROPIC_API_KEY'}")
+        st.markdown(f"ð¡ **OpenAI (Secondary):** {'Configured â' if OPENAI_API_KEY else 'â Missing OPENAI_API_KEY'}")
+        st.markdown(f"ð  **Gemini (Fallback):** {'Configured â' if GEMINI_API_KEY else 'â Missing GEMINI_API_KEY'}")
 
     if gen_btn:
-        with st.spinner("🧠 Fetching market data and generating briefing…"):
+        with st.spinner("ð§  Fetching market data and generating briefingâ¦"):
             md = {k: current_price(t) for k, t in {
                 "gold": "GC=F", "silver": "SI=F", "usd_lkr": "LKR=X",
                 "sp500": "^GSPC", "vix": "^VIX", "oil": "BZ=F",
@@ -1020,7 +1020,7 @@ elif page == "🤖 AI Briefing":
             briefing_text, model_used = generate_briefing(md)
 
         if briefing_text and "failed" not in briefing_text.lower()[:50]:
-            st.success(f"✅ Generated by **{model_used}**")
+            st.success(f"â Generated by **{model_used}**")
             st.session_state["briefing"]   = briefing_text
             st.session_state["model_used"] = model_used
         else:
@@ -1044,41 +1044,41 @@ elif page == "🤖 AI Briefing":
             text_lower = briefing_to_show.lower()
             if "bullish" in text_lower: sent = "BULLISH"
             elif "bearish" in text_lower: sent = "BEARISH"
-            if st.button("💾 Save to My Reports", use_container_width=True):
+            if st.button("ð¾ Save to My Reports", use_container_width=True):
                 if db_save_briefing(save_title, briefing_to_show, model_label, sent):
                     st.success("Saved!")
                 else:
-                    st.error("Save failed — make sure you're logged in.")
+                    st.error("Save failed â make sure you're logged in.")
 
 
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 # PAGE: WATCHLIST  (Premium)
-# ─────────────────────────────────────────────────
-elif page == "⭐ Watchlist":
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
+elif page == "â­ Watchlist":
     if not is_logged_in():
         show_premium_gate("Watchlist")
         st.stop()
 
-    st.title("⭐ My Watchlist")
-    st.caption("Track your favourite tickers — CSE stocks, global indices, commodities")
+    st.title("â­ My Watchlist")
+    st.caption("Track your favourite tickers â CSE stocks, global indices, commodities")
 
-    # ── Add ticker ──
-    with st.expander("➕ Add Ticker", expanded=False):
+    # ââ Add ticker ââ
+    with st.expander("â Add Ticker", expanded=False):
         ac1, ac2, ac3, ac4 = st.columns([2, 2, 1.5, 1])
         with ac1: new_t = st.text_input("Ticker symbol", placeholder="JKH.N0000 or ^GSPC")
         with ac2: new_n = st.text_input("Display name",  placeholder="John Keells")
         with ac3: cat   = st.selectbox("Category", ["stock", "index", "commodity", "forex"])
         with ac4:
             st.markdown("&nbsp;", unsafe_allow_html=True)
-            if st.button("Add →", type="primary"):
+            if st.button("Add â", type="primary"):
                 if new_t and new_n:
                     if db_add_watchlist(new_t.strip().upper(), new_n.strip(), cat):
-                        st.success(f"✅ {new_t.upper()} added!")
+                        st.success(f"â {new_t.upper()} added!")
                         st.rerun()
                 else:
                     st.warning("Enter ticker and name.")
 
-    # ── Display ──
+    # ââ Display ââ
     items = db_get_watchlist()
     if not items:
         st.info("Your watchlist is empty. Add tickers above to start tracking.")
@@ -1110,38 +1110,38 @@ elif page == "⭐ Watchlist":
                             unsafe_allow_html=True)
                 st.caption(ticker)
             with c2:
-                st.markdown(f"**{v:,.2f}**" if v else "—")
+                st.markdown(f"**{v:,.2f}**" if v else "â")
             with c3:
                 if p is not None:
-                    arrow = "▲" if p >= 0 else "▼"
+                    arrow = "â²" if p >= 0 else "â¼"
                     cls   = "positive" if p >= 0 else "negative"
                     st.markdown(f'<span class="{cls}">{arrow} {abs(p):.2f}%</span>',
                                 unsafe_allow_html=True)
                 else:
-                    st.markdown("—")
+                    st.markdown("â")
             with c4:
                 st.caption(item.get("added_at", "")[:10])
             with c5:
-                if st.button("✕", key=f"rm_{ticker}"):
+                if st.button("â", key=f"rm_{ticker}"):
                     db_remove_watchlist(ticker)
                     st.rerun()
             st.markdown("---")
 
 
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 # PAGE: MY REPORTS  (Premium)
-# ─────────────────────────────────────────────────
-elif page == "📋 My Reports":
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
+elif page == "ð My Reports":
     if not is_logged_in():
         show_premium_gate("My Reports")
         st.stop()
 
-    st.title("📋 My Reports")
+    st.title("ð My Reports")
     st.caption("Saved AI briefings and personal investment notes")
 
-    tab_b, tab_n = st.tabs(["🤖 Saved Briefings", "📝 My Notes"])
+    tab_b, tab_n = st.tabs(["ð¤ Saved Briefings", "ð My Notes"])
 
-    # ── SAVED BRIEFINGS ──
+    # ââ SAVED BRIEFINGS ââ
     with tab_b:
         briefings = db_get_briefings()
         if not briefings:
@@ -1150,35 +1150,35 @@ elif page == "📋 My Reports":
             st.markdown(f"**{len(briefings)} briefings saved**")
             for b in briefings:
                 sent  = b.get("sentiment", "")
-                sent_badge = {"BULLISH": "🟢", "BEARISH": "🔴", "NEUTRAL": "🟡"}.get(sent, "⚪")
+                sent_badge = {"BULLISH": "ð¢", "BEARISH": "ð´", "NEUTRAL": "ð¡"}.get(sent, "âª")
                 title = b.get("title", "Briefing")
                 dt    = b.get("created_at", "")[:10]
-                with st.expander(f"{sent_badge} {title} — {dt}"):
+                with st.expander(f"{sent_badge} {title} â {dt}"):
                     st.markdown(b.get("content", ""))
                     c1, c2 = st.columns([4, 1])
                     with c1:
-                        st.caption(f"Model: {b.get('model_used','?')} · Sentiment: {sent or 'N/A'}")
+                        st.caption(f"Model: {b.get('model_used','?')} Â· Sentiment: {sent or 'N/A'}")
                     with c2:
-                        if st.button("🗑 Delete", key=f"del_b_{b['id']}"):
+                        if st.button("ð Delete", key=f"del_b_{b['id']}"):
                             db_delete_briefing(b["id"])
                             st.rerun()
 
-    # ── MY NOTES ──
+    # ââ MY NOTES ââ
     with tab_n:
         # New note form
-        with st.expander("✏️ Write New Note", expanded=False):
+        with st.expander("âï¸ Write New Note", expanded=False):
             nc1, nc2 = st.columns([3, 1])
             with nc1: n_title = st.text_input("Note title", placeholder="My CSE Analysis")
-            with nc2: n_pinned = st.checkbox("📌 Pin")
+            with nc2: n_pinned = st.checkbox("ð Pin")
             n_content = st.text_area("Content", height=140,
-                                     placeholder="Your thoughts, analysis, reminders…")
+                                     placeholder="Your thoughts, analysis, remindersâ¦")
             n_tags = st.text_input("Tags (comma separated)",
                                    placeholder="CSE, gold, weekly-review")
-            if st.button("💾 Save Note", type="primary"):
+            if st.button("ð¾ Save Note", type="primary"):
                 if n_title and n_content:
                     tags = [t.strip() for t in n_tags.split(",") if t.strip()]
                     db_save_note(n_title, n_content, tags, n_pinned)
-                    st.success("✅ Note saved!")
+                    st.success("â Note saved!")
                     st.rerun()
                 else:
                     st.warning("Enter a title and content.")
@@ -1190,12 +1190,12 @@ elif page == "📋 My Reports":
         else:
             st.markdown(f"**{len(notes)} notes**")
             for n in notes:
-                pin_icon = "📌 " if n.get("is_pinned") else ""
+                pin_icon = "ð " if n.get("is_pinned") else ""
                 tags_html = " ".join(
                     f'<span style="background:#1e2440;color:#7b8cde;'
                     f'padding:1px 8px;border-radius:4px;font-size:0.72rem">{t}</span>'
                     for t in (n.get("tags") or []))
-                label = f"{pin_icon}{n.get('title','Note')} — {n.get('updated_at','')[:10]}"
+                label = f"{pin_icon}{n.get('title','Note')} â {n.get('updated_at','')[:10]}"
                 with st.expander(label):
                     if tags_html:
                         st.markdown(tags_html, unsafe_allow_html=True)
@@ -1206,33 +1206,33 @@ elif page == "📋 My Reports":
                     with ec1:
                         st.caption(f"Updated {n.get('updated_at','')[:16]}")
                     with ec2:
-                        if st.button("💾 Save", key=f"sv_{n['id']}"):
+                        if st.button("ð¾ Save", key=f"sv_{n['id']}"):
                             db_update_note(n["id"], content=edited)
                             st.success("Saved!")
                             st.rerun()
                     with ec3:
-                        if st.button("🗑 Del", key=f"dn_{n['id']}"):
+                        if st.button("ð Del", key=f"dn_{n['id']}"):
                             db_delete_note(n["id"])
                             st.rerun()
 
 
-# ─────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
 # PAGE: ABOUT
-# ─────────────────────────────────────────────────
-elif page == "ℹ️ About":
-    st.title("ℹ️ About InvestSmart")
+# âââââââââââââââââââââââââââââââââââââââââââââââââ
+elif page == "â¹ï¸ About":
+    st.title("â¹ï¸ About InvestSmart")
     st.markdown("""
 ## What is InvestSmart?
 
 InvestSmart is an AI-powered investment intelligence platform built specifically for Sri Lankan investors.
-It monitors global market factors that affect the Colombo Stock Exchange (CSE), gold, silver, and bonds —
+It monitors global market factors that affect the Colombo Stock Exchange (CSE), gold, silver, and bonds â
 and generates daily AI briefings to help you make better-informed investment decisions.
 
 ## Data Sources
 
 | Source | What We Use It For |
 |--------|--------------------|
-| Yahoo Finance | 40+ tickers — gold, silver, CSE indices, forex, global markets |
+| Yahoo Finance | 40+ tickers â gold, silver, CSE indices, forex, global markets |
 | FRED (Federal Reserve) | US macro data: interest rates, inflation, yield curve |
 | World Bank Open API | Sri Lanka macro: GDP, CPI, FDI, remittances |
 | NewsAPI | 6 categories of financial news |
@@ -1250,19 +1250,19 @@ and generates daily AI briefings to help you make better-informed investment dec
 - **Frontend:** Streamlit (Python)
 - **Hosting:** Streamlit Community Cloud
 - **Database & Auth:** Supabase (PostgreSQL + Auth)
-- **Auth Methods:** Email/Password · Google OAuth · Phone SMS OTP
+- **Auth Methods:** Email/Password Â· Google OAuth Â· Phone SMS OTP
 
 ## Account Features (Free vs Premium)
 
 | Feature | Free | Logged In |
 |---------|------|-----------|
-| Dashboard | ✅ | ✅ |
-| Gold & Silver | ✅ | ✅ |
-| Global Markets | ✅ | ✅ |
-| News Feed | ✅ | ✅ |
-| AI Briefing | — | ✅ |
-| Watchlist | — | ✅ |
-| My Reports & Notes | — | ✅ |
+| Dashboard | â | â |
+| Gold & Silver | â | â |
+| Global Markets | â | â |
+| News Feed | â | â |
+| AI Briefing | â | â |
+| Watchlist | â | â |
+| My Reports & Notes | â | â |
 
 ## Disclaimer
 
@@ -1270,5 +1270,5 @@ InvestSmart is for **informational purposes only**. Nothing on this platform con
 investment advice. Always do your own research and consult a licensed financial advisor
 before making investment decisions.
 
-*Built for Sri Lankan investors · v2.0 — with Authentication*
+*Built for Sri Lankan investors Â· v2.0 â with Authentication*
 """)
