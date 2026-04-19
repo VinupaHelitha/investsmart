@@ -27,7 +27,7 @@ beautifulsoup4>=4.12.0
 lxml>=5.0.0
 
 # ── Auto-Refresh ─────────────────────────────────
-streamlit-autorefresh>=0.0.1  # Auto page refresh (60s paid / 900s free)
+# streamlit-autorefresh removed - using native JS via components.v1.html()
 
 # ── Utilities ────────────────────────────────────
 python-dotenv>=1.0.0       # Load .env file locally
