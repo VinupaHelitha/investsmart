@@ -20,11 +20,8 @@ from dotenv import load_dotenv
 import html as _html
 import time as _time
 
-try:
-    from streamlit_autorefresh import st_autorefresh as _st_autorefresh
-    _AUTOREFRESH_OK = True
-except ImportError:
-    _AUTOREFRESH_OK = False
+import streamlit.components.v1 as _components_v1
+_AUTOREFRESH_OK = False  # Use native JS approach instead
 
 try:
     from supabase import create_client
@@ -1261,22 +1258,16 @@ Reference actual numbers. 2\u20133 sentences per section. End with:
 _init_state()
 if _sb: _handle_oauth_callback()
 
-# -- AUTO-REFRESH (runs on every page load) -----------------------------------
-# Free users: refresh every 15 min | Paid users: every 60 s
-_refresh_interval_ms = 60_000 if is_paid_user() else 900_000
-if _AUTOREFRESH_OK:
-    _refresh_count = _st_autorefresh(
-        interval=_refresh_interval_ms,
-        limit=None,
-        key="global_autorefresh")
-else:
-    # Fallback: manual JS meta-refresh injected once per session
-    _refresh_secs = 60 if is_paid_user() else 900
-    if "meta_refresh_injected" not in st.session_state:
-        st.session_state["meta_refresh_injected"] = True
-        st.markdown(
-            f'<meta http-equiv="refresh" content="{_refresh_secs}">',
-            unsafe_allow_html=True)
+# -- AUTO-REFRESH via native JS (60s paid / 900s free) -----------------------
+_refresh_ms = 60_000 if is_paid_user() else 900_000
+_components_v1.html(
+    f"""<script>
+      (function() {{
+        var ms = {_refresh_ms};
+        setTimeout(function() {{ window.parent.location.reload(); }}, ms);
+      }})();
+    </script>""",
+    height=0, scrolling=False)
 
 with st.sidebar:
     st.markdown("## \U0001f4c8 InvestSmart")
