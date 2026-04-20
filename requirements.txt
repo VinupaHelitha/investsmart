@@ -22,6 +22,9 @@ neo4j>=5.19.0              # Graph database for behaviour prediction
 # ── Visualisation ────────────────────────────────
 plotly>=5.20.0             # Candlestick charts, line charts
 
+# ── CSE Live Feed ────────────────────────────────
+websocket-client>=1.7.0    # SockJS+STOMP feed from cse.lk
+
 # ── Web Scraping (CSE) ───────────────────────────
 beautifulsoup4>=4.12.0
 lxml>=5.0.0
