@@ -696,17 +696,26 @@ def db_get_cse_history(symbol: str, days: int = 365) -> list:
 def _fetch_one_cse(ticker: str) -> tuple:
     """Fetch a single CSE stock price via yf.Ticker.history() (reliable)."""
     try:
-        hist = yf.Ticker(ticker).history(period="5d", auto_adjust=True)
-        if hist is None or len(hist) < 2:
+        # Use 1mo period for resilience — ensures data even around holidays/weekends
+        hist = yf.Ticker(ticker).history(period="1mo", auto_adjust=True)
+        if hist is None or len(hist) < 1:
             return ticker, None
-        last   = hist.iloc[-1]
-        prev   = hist.iloc[-2]
-        close  = float(last["Close"])
-        prev_c = float(prev["Close"])
-        if close <= 0 or prev_c <= 0:
+        # Drop rows with zero/null close prices
+        hist = hist[hist["Close"] > 0].dropna(subset=["Close"])
+        if len(hist) < 1:
             return ticker, None
-        change = close - prev_c
-        chg_p  = (change / prev_c * 100) if prev_c else 0.0
+        last  = hist.iloc[-1]
+        close = float(last["Close"])
+        if close <= 0:
+            return ticker, None
+        # Calculate change only if previous day available
+        if len(hist) >= 2:
+            prev_c = float(hist.iloc[-2]["Close"])
+            change = close - prev_c
+            chg_p  = (change / prev_c * 100) if prev_c else 0.0
+        else:
+            change = 0.0
+            chg_p  = 0.0
         return ticker, {
             "ticker":     ticker,
             "symbol":     ticker.replace(".LK", ""),
@@ -718,7 +727,7 @@ def _fetch_one_cse(ticker: str) -> tuple:
             "low":        float(last.get("Low",    close)),
             "volume":     int(last.get("Volume", 0) or 0),
         }
-    except:
+    except Exception:
         return ticker, None
 
 def _do_fetch_cse_board() -> dict:
