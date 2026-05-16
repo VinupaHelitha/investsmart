@@ -1,0 +1,60 @@
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.secret
+
+# Deployment
+deploy.log
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Project specific
+.streamlit/secrets.toml
+neo4j_credentials.json
+creds.json
+node_modules/
+
+# Graphify cache
+graphify-out/cache/
+graphify-out/.graphify_*
+graphify-out/obsidian/
+
+# Test outputs
+test_results/
+coverage/
+
+# Temporary files
+*.tmp
+*.temp
+*~
+\#*\#

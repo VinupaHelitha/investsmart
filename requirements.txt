@@ -1,0 +1,38 @@
+# InvestSmart — Python Dependencies
+# Install with: pip install -r requirements.txt
+# ⚠️  PINNED VERSIONS — Do NOT use >= (causes version drift)
+# Updated: 2026-05-16 (Phase 3: Infrastructure Task 3.1)
+
+# ── Core Framework ──────────────────────────────
+streamlit==1.35.0
+
+# ── Data & Finance ──────────────────────────────
+yfinance==0.2.38
+pandas==2.0.3
+numpy==1.24.3
+requests==2.31.0
+
+# ── AI Providers ────────────────────────────────
+anthropic==0.25.8          # PRIMARY: Claude (claude-sonnet-4-6)
+openai==1.34.0             # SECONDARY: GPT-4o
+google-generativeai==0.5.2 # FALLBACK: Gemini 1.5 Flash (free)
+
+# ── Database ─────────────────────────────────────
+supabase==2.4.3            # PostgreSQL + auth (free 500MB)
+neo4j==5.19.0              # Graph database for behaviour prediction
+
+# ── Visualisation ────────────────────────────────
+plotly==5.20.0             # Candlestick charts, line charts
+
+# ── CSE Live Feed ────────────────────────────────
+websocket-client==1.7.0    # SockJS+STOMP feed from cse.lk
+
+# ── Web Scraping (CSE) ───────────────────────────
+beautifulsoup4==4.12.2
+lxml==5.1.0
+
+# ── Auto-Refresh ─────────────────────────────────
+# streamlit-autorefresh removed - using native JS via components.v1.html()
+
+# ── Utilities ────────────────────────────────────
+python-dotenv==1.0.1       # Load .env file locally

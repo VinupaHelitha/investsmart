@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head><title>InvestSmart Push</title>
+<style>body{font-family:monospace;background:#111;color:#0f0;padding:20px;}
+#log{white-space:pre-wrap;}</style>
+</head>
+<body>
+<div id="log">Starting injection pipeline...\n</div>
+<script>
+const log = s => { document.getElementById('log').textContent += s+'\n'; console.log(s); };
+const TOKEN = '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';
+const REPO  = 'VinupaHelitha/investsmart';
+const BRANCH = 'main';
+const PATH  = 'app.py';
+
+async function run() {
+  window._appB64 = '';
+  // Load all 9 inject files
+  for (let i = 0; i < 9; i++) {
+    log(`Fetching inject${i}.js...`);
+    const r = await fetch(`inject${i}.js`);
+    if (!r.ok) { log(`ERROR: fetch inject${i}.js failed: ${r.status}`); return; }
+    const code = await r.text();
+    log(`  Got ${code.length} bytes, evaluating...`);
+    eval(code);
+    log(`  _appB64.length = ${window._appB64.length}`);
+  }
+
+  const totalLen = window._appB64.length;
+  const last8 = window._appB64.slice(-8);
+  log(`\nAll batches done. Total length: ${totalLen}  last8: ${last8}`);
+  if (totalLen !== 143156) {
+    log(`ERROR: Expected 143156 but got ${totalLen}. Aborting.`);
+    return;
+  }
+
+  // Get current file SHA
+  log('\nFetching current app.py SHA from GitHub...');
+  const metaResp = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
+    headers: { Authorization: `token ${TOKEN}`, Accept: 'application/vnd.github.v3+json' }
+  });
+  if (!metaResp.ok) { log(`ERROR getting SHA: ${metaResp.status} ${await metaResp.text()}`); return; }
+  const meta = await metaResp.json();
+  const sha = meta.sha;
+  log(`Got SHA: ${sha}`);
+
+  // PUT new content
+  log('\nPushing app.py to GitHub...');
+  const pushResp = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `token ${TOKEN}`,
+      Accept: 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      message: 'fix: replace yfinance CSE data with direct CSE WebSocket live feed',
+      content: window._appB64,
+      sha: sha,
+      branch: BRANCH
+    })
+  });
+  const j = await pushResp.json();
+  log(`Push status: ${pushResp.status}`);
+  log(`Commit SHA: ${j?.commit?.sha || 'N/A'}`);
+  log(`Result: ${JSON.stringify(j).slice(0,200)}`);
+  if (pushResp.status === 200 || pushResp.status === 201) {
+    log('\n✅ SUCCESS! Streamlit Cloud should redeploy shortly.');
+  } else {
+    log('\n❌ PUSH FAILED');
+  }
+}
+run().catch(e => document.getElementById('log').textContent += 'EXCEPTION: '+e);
+</script>
+</body>
+</html>
